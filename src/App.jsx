@@ -23,14 +23,14 @@ import Profile from "./pages/Profile";
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
 
         {/* Public Pages */}
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
 
+        <Route path="/login" element={<Login />} />
+
+        <Route path="/register" element={<Register />} />
 
         {/* Dashboard Pages */}
         <Route
@@ -124,7 +124,6 @@ function App() {
         />
 
       </Routes>
-
     </BrowserRouter>
   );
 }
