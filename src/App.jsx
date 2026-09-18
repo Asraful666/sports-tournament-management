@@ -1,6 +1,13 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+
+import Layout from "./components/Layout";
 
 import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Tournaments from "./pages/Tournaments";
@@ -16,33 +23,108 @@ import Profile from "./pages/Profile";
 function App() {
   return (
     <BrowserRouter>
+
       <Routes>
 
+        {/* Public Pages */}
         <Route path="/" element={<Home />} />
-
         <Route path="/login" element={<Login />} />
-
         <Route path="/register" element={<Register />} />
 
-        <Route path="/tournaments" element={<Tournaments />} />
 
-        <Route path="/teams" element={<Teams />} />
+        {/* Dashboard Pages */}
+        <Route
+          path="/dashboard"
+          element={
+            <Layout>
+              <Dashboard />
+            </Layout>
+          }
+        />
 
-        <Route path="/players" element={<Players />} />
+        <Route
+          path="/tournaments"
+          element={
+            <Layout>
+              <Tournaments />
+            </Layout>
+          }
+        />
 
-        <Route path="/matches" element={<Matches />} />
+        <Route
+          path="/teams"
+          element={
+            <Layout>
+              <Teams />
+            </Layout>
+          }
+        />
 
-        <Route path="/venues" element={<Venues />} />
+        <Route
+          path="/players"
+          element={
+            <Layout>
+              <Players />
+            </Layout>
+          }
+        />
 
-        <Route path="/referees" element={<Referees />} />
+        <Route
+          path="/matches"
+          element={
+            <Layout>
+              <Matches />
+            </Layout>
+          }
+        />
 
-        <Route path="/results" element={<Results />} />
+        <Route
+          path="/venues"
+          element={
+            <Layout>
+              <Venues />
+            </Layout>
+          }
+        />
 
-        <Route path="/standings" element={<Standings />} />
+        <Route
+          path="/referees"
+          element={
+            <Layout>
+              <Referees />
+            </Layout>
+          }
+        />
 
-        <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/results"
+          element={
+            <Layout>
+              <Results />
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/standings"
+          element={
+            <Layout>
+              <Standings />
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <Layout>
+              <Profile />
+            </Layout>
+          }
+        />
 
       </Routes>
+
     </BrowserRouter>
   );
 }
