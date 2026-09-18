@@ -10,6 +10,7 @@ body {
   color: #1f2937;
 }
 
+
 button,
 input {
   font-family: inherit;
@@ -1360,5 +1361,44 @@ td {
 
   .search-input {
     width: auto;
+  }
+}
+/* =========================
+   PLAYER MANAGEMENT
+========================= */
+
+.jersey-number {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #eeeeee;
+  font-weight: 600;
+}
+
+.form-group select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  outline: none;
+  background: white;
+  font-size: 14px;
+}
+
+.form-group select:focus {
+  border-color: #333;
+}
+
+@media (max-width: 900px) {
+  .table-container {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 1000px;
   }
 }
