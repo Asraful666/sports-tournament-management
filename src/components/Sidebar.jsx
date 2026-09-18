@@ -2,56 +2,20 @@ import { NavLink } from "react-router-dom";
 
 function Sidebar() {
   const menuItems = [
-    {
-      title: "Dashboard",
-      path: "/dashboard",
-      icon: "▦",
-    },
-    {
-      title: "Tournaments",
-      path: "/tournaments",
-      icon: "🏆",
-    },
-    {
-      title: "Teams",
-      path: "/teams",
-      icon: "👥",
-    },
-    {
-      title: "Players",
-      path: "/players",
-      icon: "⚽",
-    },
-    {
-      title: "Matches",
-      path: "/matches",
-      icon: "📅",
-    },
-    {
-      title: "Venues",
-      path: "/venues",
-      icon: "📍",
-    },
-    {
-      title: "Referees",
-      path: "/referees",
-      icon: "🧑‍⚖️",
-    },
-    {
-      title: "Results",
-      path: "/results",
-      icon: "📊",
-    },
-    {
-      title: "Standings",
-      path: "/standings",
-      icon: "🥇",
-    },
+    ["Dashboard", "/dashboard", "▦"],
+    ["Tournaments", "/tournaments", "🏆"],
+    ["Teams", "/teams", "👥"],
+    ["Players", "/players", "⚽"],
+    ["Matches", "/matches", "📅"],
+    ["Venues", "/venues", "📍"],
+    ["Referees", "/referees", "🧑‍⚖️"],
+    ["Results", "/results", "📊"],
+    ["Standings", "/standings", "🥇"],
   ];
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-logo">
+      <div className="logo">
         <div className="logo-icon">🏆</div>
 
         <div>
@@ -60,39 +24,32 @@ function Sidebar() {
         </div>
       </div>
 
-      <div className="sidebar-section-title">
-        MAIN MENU
-      </div>
+      <p className="menu-title">MAIN MENU</p>
 
-      <nav className="sidebar-nav">
-        {menuItems.map((item) => (
+      <nav>
+        {menuItems.map(([name, path, icon]) => (
           <NavLink
-            key={item.path}
-            to={item.path}
+            key={path}
+            to={path}
             className={({ isActive }) =>
-              isActive ? "nav-item active" : "nav-item"
+              isActive ? "nav-link active" : "nav-link"
             }
           >
-            <span className="nav-icon">{item.icon}</span>
-            <span>{item.title}</span>
+            <span>{icon}</span>
+            {name}
           </NavLink>
         ))}
       </nav>
 
       <div className="sidebar-bottom">
-        <NavLink
-          to="/profile"
-          className={({ isActive }) =>
-            isActive ? "nav-item active" : "nav-item"
-          }
-        >
-          <span className="nav-icon">👤</span>
-          <span>Profile</span>
+        <NavLink to="/profile" className="nav-link">
+          <span>👤</span>
+          Profile
         </NavLink>
 
-        <button className="logout-btn">
-          <span className="nav-icon">↪</span>
-          <span>Logout</span>
+        <button className="logout">
+          <span>↪</span>
+          Logout
         </button>
       </div>
     </aside>

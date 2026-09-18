@@ -3,16 +3,18 @@ import Header from "./Header";
 
 function Layout({ children }) {
   return (
-    <div className="app-layout">
+    <div className="layout">
+
       <Sidebar />
 
-      <div className="main-area">
+      <div className="content-area">
         <Header />
 
-        <main className="page-content">
+        <main className="content">
           {children}
         </main>
       </div>
+
     </div>
   );
 }
