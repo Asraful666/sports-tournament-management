@@ -1523,3 +1523,130 @@ td {
     width: 100%;
   }
 }
+/* =========================
+   RESULT MANAGEMENT
+========================= */
+
+.result-modal {
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.result-form {
+  padding-bottom: 5px;
+}
+
+.result-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 35px;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.score-separator {
+  margin: 0 6px;
+}
+
+.result-winner {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #f0fdf4;
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.result-winner.draw {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.selected-match-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+}
+
+.selected-match-box strong {
+  color: #6b7280;
+}
+
+.winner-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 13px 15px;
+  border-radius: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.winner-preview span {
+  color: #166534;
+  font-weight: 500;
+}
+
+.winner-preview strong {
+  color: #15803d;
+}
+
+.result-form textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 90px;
+}
+
+.result-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 25px;
+  padding-top: 18px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.result-form-actions button {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .result-modal {
+    width: calc(100% - 30px);
+    max-height: 90vh;
+  }
+
+  .result-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .result-form-actions button {
+    width: 100%;
+  }
+
+  .selected-match-box {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
