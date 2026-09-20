@@ -1445,3 +1445,21 @@ td {
     min-width: 900px;
   }
 }
+/* =========================
+   REFEREE MANAGEMENT
+========================= */
+
+.table-container table td:nth-child(3),
+.table-container table td:nth-child(4) {
+  white-space: nowrap;
+}
+
+.table-container table td:nth-child(4) {
+  color: #555;
+}
+
+@media (max-width: 900px) {
+  .table-container table {
+    min-width: 850px;
+  }
+}
