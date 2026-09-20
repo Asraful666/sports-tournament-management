@@ -1402,3 +1402,46 @@ td {
     min-width: 1000px;
   }
 }
+/*VENUE MANAGEMENT*/
+
+.status.available {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: none;
+  cursor: pointer;
+}
+
+.status.unavailable {
+  background: #fef2f2;
+  color: #dc2626;
+  border: none;
+  cursor: pointer;
+}
+
+.status.available:hover {
+  background: #dcfce7;
+}
+
+.status.unavailable:hover {
+  background: #fee2e2;
+}
+
+
+/* Venue table */
+
+.table-container table td:nth-child(4) {
+  font-weight: 600;
+}
+
+.table-container table td:nth-child(5) {
+  white-space: nowrap;
+}
+
+
+/* Venue responsive */
+
+@media (max-width: 900px) {
+  .table-container table {
+    min-width: 900px;
+  }
+}
