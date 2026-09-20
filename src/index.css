@@ -1463,3 +1463,63 @@ td {
     min-width: 850px;
   }
 }
+/* =========================
+   MATCH MODAL
+========================= */
+
+.match-modal {
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.match-form {
+  padding-bottom: 5px;
+}
+
+.match-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 25px;
+  padding-top: 18px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.match-form-actions button {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.create-fixture-btn {
+  display: inline-flex !important;
+}
+
+.cancel-btn {
+  display: inline-flex !important;
+}
+
+@media (max-width: 600px) {
+  .match-modal {
+    width: calc(100% - 30px);
+    max-height: 90vh;
+  }
+
+  .match-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .match-form-actions button {
+    width: 100%;
+  }
+}
