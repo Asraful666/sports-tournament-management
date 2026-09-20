@@ -1,76 +1,44 @@
 import { useState } from "react";
 
-const initialReferees = [
-  {
-    id: 1,
-    name: "Rahim Ahmed",
-    phone: "01711111111",
-    email: "rahim@example.com",
-    createdAt: "2026-09-01",
-  },
-  {
-    id: 2,
-    name: "Karim Hasan",
-    phone: "01822222222",
-    email: "karim@example.com",
-    createdAt: "2026-09-03",
-  },
-  {
-    id: 3,
-    name: "Sakib Hossain",
-    phone: "01933333333",
-    email: "sakib@example.com",
-    createdAt: "2026-09-05",
-  },
-];
-
-const emptyForm = {
-  name: "",
-  phone: "",
-  email: "",
-};
-
 function Referees() {
-  const [referees, setReferees] = useState(initialReferees);
-  const [search, setSearch] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState(emptyForm);
+  const [referees, setReferees] = useState([
+    {
+      id: 1,
+      name: "Abdul Karim",
+      phone: "01711111111",
+      email: "abdulkarim@example.com",
+      createdAt: "2026-08-10",
+    },
+    {
+      id: 2,
+      name: "Rahim Ahmed",
+      phone: "01822222222",
+      email: "rahim@example.com",
+      createdAt: "2026-08-12",
+    },
+    {
+      id: 3,
+      name: "Sakib Hasan",
+      phone: "01933333333",
+      email: "sakib@example.com",
+      createdAt: "2026-08-15",
+    },
+  ]);
 
-  const isEditing = editingId !== null;
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Search referees
-  const filteredReferees = referees.filter((referee) => {
-    const searchText = search.toLowerCase();
+  const [isModalOpen, setIsModalOpen] =
+    useState(false);
 
-    return (
-      referee.name.toLowerCase().includes(searchText) ||
-      referee.phone.includes(searchText) ||
-      referee.email.toLowerCase().includes(searchText)
-    );
+  const [editingReferee, setEditingReferee] =
+    useState(null);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
   });
 
-  // Open Add Modal
-  const handleAdd = () => {
-    setEditingId(null);
-    setFormData(emptyForm);
-    setShowModal(true);
-  };
-
-  // Open Edit Modal
-  const handleEdit = (referee) => {
-    setEditingId(referee.id);
-
-    setFormData({
-      name: referee.name,
-      phone: referee.phone,
-      email: referee.email,
-    });
-
-    setShowModal(true);
-  };
-
-  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -80,14 +48,51 @@ function Referees() {
     }));
   };
 
-  // Add / Update referee
+  const openAddModal = () => {
+    setEditingReferee(null);
+
+    setFormData({
+      name: "",
+      phone: "",
+      email: "",
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (referee) => {
+    setEditingReferee(referee);
+
+    setFormData({
+      name: referee.name,
+      phone: referee.phone,
+      email: referee.email,
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingReferee(null);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (isEditing) {
+    if (
+      !formData.name ||
+      !formData.phone ||
+      !formData.email
+    ) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    if (editingReferee) {
       setReferees((previous) =>
         previous.map((referee) =>
-          referee.id === editingId
+          referee.id === editingReferee.id
             ? {
                 ...referee,
                 name: formData.name,
@@ -97,6 +102,8 @@ function Referees() {
             : referee
         )
       );
+
+      alert("Referee updated successfully!");
     } else {
       const newReferee = {
         id: Date.now(),
@@ -112,21 +119,16 @@ function Referees() {
         ...previous,
         newReferee,
       ]);
+
+      alert("Referee added successfully!");
     }
 
     closeModal();
   };
 
-  // Delete referee
   const handleDelete = (id) => {
-    const referee = referees.find(
-      (item) => item.id === id
-    );
-
     const confirmed = window.confirm(
-      `Are you sure you want to delete ${
-        referee?.name || "this referee"
-      }?`
+      "Are you sure you want to delete this referee?"
     );
 
     if (!confirmed) return;
@@ -138,195 +140,141 @@ function Referees() {
     );
   };
 
-  // Close modal
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingId(null);
-    setFormData(emptyForm);
-  };
+  const filteredReferees = referees.filter(
+    (referee) => {
+      const search = searchTerm
+        .toLowerCase()
+        .trim();
+
+      return (
+        referee.name
+          .toLowerCase()
+          .includes(search) ||
+        referee.phone
+          .toLowerCase()
+          .includes(search) ||
+        referee.email
+          .toLowerCase()
+          .includes(search)
+      );
+    }
+  );
+
+  const totalReferees = referees.length;
 
   return (
     <div className="page">
 
-      {/* Page Header */}
+      {/* PAGE HEADER */}
       <div className="page-header">
+
         <div>
           <h1>Referee Management</h1>
+
           <p>
-            Add and manage tournament referees
+            Manage tournament referees and
+            their contact information.
           </p>
         </div>
 
+        {/* ONLY ONE ADD REFEREE BUTTON */}
         <button
           className="primary-btn"
-          onClick={handleAdd}
+          onClick={openAddModal}
         >
           + Add Referee
         </button>
+
       </div>
 
-      {/* Statistics */}
-      <div className="stats">
+      {/* SUMMARY CARD */}
+      <div className="summary-grid">
 
-        <div className="card">
-          <div className="card-top">
-            <span>Total Referees</span>
+        <div className="summary-card">
 
-            <div className="card-icon">
-              🧑‍⚖️
-            </div>
+          <div className="summary-icon">
+            🧑‍⚖️
           </div>
 
-          <h3>{referees.length}</h3>
+          <div>
+            <h3>{totalReferees}</h3>
+            <p>Total Referees</p>
+          </div>
 
-          <small>
-            Registered referees
-          </small>
         </div>
 
-        <div className="card">
-          <div className="card-top">
-            <span>Active Referees</span>
+        <div className="summary-card">
 
-            <div className="card-icon">
-              ✅
-            </div>
+          <div className="summary-icon">
+            📞
           </div>
 
-          <h3>{referees.length}</h3>
+          <div>
+            <h3>
+              {referees.filter(
+                (referee) => referee.phone
+              ).length}
+            </h3>
 
-          <small>
-            Available referees
-          </small>
+            <p>Contact Available</p>
+          </div>
+
         </div>
 
-        <div className="card">
-          <div className="card-top">
-            <span>Contact Records</span>
+        <div className="summary-card">
 
-            <div className="card-icon">
-              📞
-            </div>
+          <div className="summary-icon">
+            ✉️
           </div>
 
-          <h3>{referees.length}</h3>
+          <div>
+            <h3>
+              {referees.filter(
+                (referee) => referee.email
+              ).length}
+            </h3>
 
-          <small>
-            Phone numbers stored
-          </small>
-        </div>
-
-        <div className="card">
-          <div className="card-top">
-            <span>Email Records</span>
-
-            <div className="card-icon">
-              ✉️
-            </div>
+            <p>Email Available</p>
           </div>
 
-          <h3>{referees.length}</h3>
-
-          <small>
-            Email addresses stored
-          </small>
         </div>
 
       </div>
 
-      {/* Search Toolbar */}
+      {/* SEARCH */}
       <div className="toolbar">
 
         <input
-          type="search"
+          type="text"
           className="search-input"
-          placeholder="Search referee, phone or email..."
-          value={search}
+          placeholder="Search referee by name, phone or email..."
+          value={searchTerm}
           onChange={(e) =>
-            setSearch(e.target.value)
+            setSearchTerm(e.target.value)
           }
         />
 
-        <button
-          className="primary-btn"
-          onClick={handleAdd}
-        >
-          + Add Referee
-        </button>
-
       </div>
 
-      {/* Referee Table */}
+      {/* REFEREE TABLE */}
       <div className="table-container">
 
         <table>
 
           <thead>
             <tr>
-              <th>ID</th>
+              <th>#</th>
               <th>Referee Name</th>
               <th>Phone</th>
               <th>Email</th>
               <th>Created At</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
 
           <tbody>
 
-            {filteredReferees.length > 0 ? (
-              filteredReferees.map((referee) => (
-                <tr key={referee.id}>
-
-                  <td>
-                    #{referee.id}
-                  </td>
-
-                  <td>
-                    <strong>
-                      {referee.name}
-                    </strong>
-                  </td>
-
-                  <td>
-                    {referee.phone}
-                  </td>
-
-                  <td>
-                    {referee.email}
-                  </td>
-
-                  <td>
-                    {referee.createdAt}
-                  </td>
-
-                  <td>
-                    <div className="action-buttons">
-
-                      <button
-                        className="edit-btn"
-                        onClick={() =>
-                          handleEdit(referee)
-                        }
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        className="delete-btn"
-                        onClick={() =>
-                          handleDelete(referee.id)
-                        }
-                      >
-                        Delete
-                      </button>
-
-                    </div>
-                  </td>
-
-                </tr>
-              ))
-            ) : (
+            {filteredReferees.length === 0 ? (
               <tr>
                 <td
                   colSpan="6"
@@ -335,6 +283,64 @@ function Referees() {
                   No referees found.
                 </td>
               </tr>
+            ) : (
+              filteredReferees.map(
+                (referee, index) => (
+                  <tr key={referee.id}>
+
+                    <td>{index + 1}</td>
+
+                    <td>
+                      <strong>
+                        {referee.name}
+                      </strong>
+                    </td>
+
+                    <td>
+                      {referee.phone}
+                    </td>
+
+                    <td>
+                      {referee.email}
+                    </td>
+
+                    <td>
+                      {referee.createdAt}
+                    </td>
+
+                    <td>
+
+                      <div className="action-buttons">
+
+                        <button
+                          className="edit-btn"
+                          onClick={() =>
+                            openEditModal(
+                              referee
+                            )
+                          }
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className="delete-btn"
+                          onClick={() =>
+                            handleDelete(
+                              referee.id
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+                )
+              )
             )}
 
           </tbody>
@@ -343,8 +349,8 @@ function Referees() {
 
       </div>
 
-      {/* Add / Edit Modal */}
-      {showModal && (
+      {/* ADD / EDIT REFEREE MODAL */}
+      {isModalOpen && (
         <div className="modal-overlay">
 
           <div className="modal">
@@ -352,19 +358,22 @@ function Referees() {
             <div className="modal-header">
 
               <div>
+
                 <h2>
-                  {isEditing
+                  {editingReferee
                     ? "Edit Referee"
-                    : "Add New Referee"}
+                    : "Add Referee"}
                 </h2>
 
                 <p>
-                  Enter referee information below
+                  {editingReferee
+                    ? "Update referee information."
+                    : "Add a new referee."}
                 </p>
+
               </div>
 
               <button
-                type="button"
                 className="close-btn"
                 onClick={closeModal}
               >
@@ -375,7 +384,6 @@ function Referees() {
 
             <form onSubmit={handleSubmit}>
 
-              {/* Name */}
               <div className="form-group">
 
                 <label>
@@ -388,16 +396,14 @@ function Referees() {
                   placeholder="Enter referee name"
                   value={formData.name}
                   onChange={handleChange}
-                  required
                 />
 
               </div>
 
-              {/* Phone */}
               <div className="form-group">
 
                 <label>
-                  Phone Number
+                  Phone
                 </label>
 
                 <input
@@ -406,16 +412,14 @@ function Referees() {
                   placeholder="Enter phone number"
                   value={formData.phone}
                   onChange={handleChange}
-                  required
                 />
 
               </div>
 
-              {/* Email */}
               <div className="form-group">
 
                 <label>
-                  Email Address
+                  Email
                 </label>
 
                 <input
@@ -424,12 +428,10 @@ function Referees() {
                   placeholder="Enter email address"
                   value={formData.email}
                   onChange={handleChange}
-                  required
                 />
 
               </div>
 
-              {/* Modal Actions */}
               <div className="modal-actions">
 
                 <button
@@ -444,7 +446,7 @@ function Referees() {
                   type="submit"
                   className="primary-btn"
                 >
-                  {isEditing
+                  {editingReferee
                     ? "Update Referee"
                     : "Add Referee"}
                 </button>

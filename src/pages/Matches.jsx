@@ -1,193 +1,127 @@
 import { useState } from "react";
 
-const tournaments = [
-  {
-    id: 1,
-    name: "University Football Championship 2026",
-  },
-  {
-    id: 2,
-    name: "Inter Department Cricket Cup 2026",
-  },
-];
-
-const teams = [
-  {
-    id: 1,
-    name: "CSE Warriors",
-  },
-  {
-    id: 2,
-    name: "EEE Titans",
-  },
-  {
-    id: 3,
-    name: "BBA Strikers",
-  },
-];
-
-const venues = [
-  {
-    id: 1,
-    name: "University Football Ground",
-  },
-  {
-    id: 2,
-    name: "University Cricket Ground",
-  },
-  {
-    id: 3,
-    name: "Indoor Sports Complex",
-  },
-];
-
-const referees = [
-  {
-    id: 1,
-    name: "Rahim Ahmed",
-  },
-  {
-    id: 2,
-    name: "Karim Hasan",
-  },
-  {
-    id: 3,
-    name: "Sakib Hossain",
-  },
-];
-
-const initialMatches = [
-  {
-    id: 1,
-    tournamentId: 1,
-    homeTeamId: 1,
-    awayTeamId: 2,
-    venueId: 1,
-    refereeId: 1,
-    matchDate: "2026-10-05",
-    matchTime: "15:00",
-    round: "Semi Final",
-  },
-  {
-    id: 2,
-    tournamentId: 1,
-    homeTeamId: 2,
-    awayTeamId: 3,
-    venueId: 1,
-    refereeId: 2,
-    matchDate: "2026-10-07",
-    matchTime: "16:00",
-    round: "Group Stage",
-  },
-  {
-    id: 3,
-    tournamentId: 2,
-    homeTeamId: 1,
-    awayTeamId: 3,
-    venueId: 2,
-    refereeId: 3,
-    matchDate: "2026-10-10",
-    matchTime: "14:30",
-    round: "Final",
-  },
-];
-
-const emptyForm = {
-  tournamentId: "",
-  homeTeamId: "",
-  awayTeamId: "",
-  venueId: "",
-  refereeId: "",
-  matchDate: "",
-  matchTime: "",
-  round: "",
-};
-
 function Matches() {
-  const [matches, setMatches] = useState(initialMatches);
-  const [search, setSearch] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState(emptyForm);
+  const tournaments = [
+    { id: 1, name: "SIU Football Championship 2026" },
+    { id: 2, name: "Inter Department Cricket Cup" },
+    { id: 3, name: "University Basketball League" },
+  ];
 
-  const isEditing = editingId !== null;
+  const teams = [
+    { id: 1, name: "CSE Warriors" },
+    { id: 2, name: "EEE Titans" },
+    { id: 3, name: "BBA Strikers" },
+    { id: 4, name: "Civil United" },
+  ];
+
+  const venues = [
+    { id: 1, name: "SIU Main Ground" },
+    { id: 2, name: "University Indoor Hall" },
+    { id: 3, name: "City Sports Complex" },
+  ];
+
+  const referees = [
+    { id: 1, name: "Abdul Karim" },
+    { id: 2, name: "Rahim Ahmed" },
+    { id: 3, name: "Sakib Hasan" },
+  ];
+
+  const [matches, setMatches] = useState([
+    {
+      id: 1,
+      tournamentId: 1,
+      homeTeamId: 1,
+      awayTeamId: 2,
+      venueId: 1,
+      refereeId: 1,
+      matchDate: "2026-09-20",
+      matchTime: "04:00 PM",
+      round: "Group Stage",
+      createdAt: "2026-08-20",
+    },
+    {
+      id: 2,
+      tournamentId: 1,
+      homeTeamId: 3,
+      awayTeamId: 4,
+      venueId: 3,
+      refereeId: 2,
+      matchDate: "2026-09-22",
+      matchTime: "03:30 PM",
+      round: "Group Stage",
+      createdAt: "2026-08-21",
+    },
+    {
+      id: 3,
+      tournamentId: 2,
+      homeTeamId: 1,
+      awayTeamId: 3,
+      venueId: 2,
+      refereeId: 3,
+      matchDate: "2026-09-25",
+      matchTime: "05:00 PM",
+      round: "Semi Final",
+      createdAt: "2026-08-22",
+    },
+  ]);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [tournamentFilter, setTournamentFilter] =
+    useState("all");
+  const [roundFilter, setRoundFilter] =
+    useState("all");
+
+  const [isModalOpen, setIsModalOpen] =
+    useState(false);
+
+  const [editingMatch, setEditingMatch] =
+    useState(null);
+
+  const [formData, setFormData] = useState({
+    tournamentId: "",
+    homeTeamId: "",
+    awayTeamId: "",
+    venueId: "",
+    refereeId: "",
+    matchDate: "",
+    matchTime: "",
+    round: "",
+  });
 
   const getTournamentName = (id) => {
-    const item = tournaments.find(
-      (tournament) => tournament.id === Number(id)
+    const tournament = tournaments.find(
+      (item) => item.id === Number(id)
     );
 
-    return item ? item.name : "Unknown Tournament";
+    return tournament
+      ? tournament.name
+      : "Unknown Tournament";
   };
 
   const getTeamName = (id) => {
-    const item = teams.find(
-      (team) => team.id === Number(id)
+    const team = teams.find(
+      (item) => item.id === Number(id)
     );
 
-    return item ? item.name : "Unknown Team";
+    return team ? team.name : "Unknown Team";
   };
 
   const getVenueName = (id) => {
-    const item = venues.find(
-      (venue) => venue.id === Number(id)
+    const venue = venues.find(
+      (item) => item.id === Number(id)
     );
 
-    return item ? item.name : "Unknown Venue";
+    return venue ? venue.name : "Unknown Venue";
   };
 
   const getRefereeName = (id) => {
-    const item = referees.find(
-      (referee) => referee.id === Number(id)
+    const referee = referees.find(
+      (item) => item.id === Number(id)
     );
 
-    return item ? item.name : "Unknown Referee";
-  };
-
-  const filteredMatches = matches.filter((match) => {
-    const text = search.toLowerCase();
-
-    return (
-      getTournamentName(match.tournamentId)
-        .toLowerCase()
-        .includes(text) ||
-      getTeamName(match.homeTeamId)
-        .toLowerCase()
-        .includes(text) ||
-      getTeamName(match.awayTeamId)
-        .toLowerCase()
-        .includes(text) ||
-      getVenueName(match.venueId)
-        .toLowerCase()
-        .includes(text) ||
-      getRefereeName(match.refereeId)
-        .toLowerCase()
-        .includes(text) ||
-      match.round.toLowerCase().includes(text)
-    );
-  });
-
-  const handleAdd = () => {
-    setEditingId(null);
-    setFormData(emptyForm);
-    setShowModal(true);
-  };
-
-  const handleEdit = (match) => {
-    setEditingId(match.id);
-
-    setFormData({
-      tournamentId: String(match.tournamentId),
-      homeTeamId: String(match.homeTeamId),
-      awayTeamId: String(match.awayTeamId),
-      venueId: String(match.venueId),
-      refereeId: String(match.refereeId),
-      matchDate: match.matchDate,
-      matchTime: match.matchTime,
-      round: match.round,
-    });
-
-    setShowModal(true);
+    return referee
+      ? referee.name
+      : "Unknown Referee";
   };
 
   const handleChange = (e) => {
@@ -197,6 +131,45 @@ function Matches() {
       ...previous,
       [name]: value,
     }));
+  };
+
+  const openAddModal = () => {
+    setEditingMatch(null);
+
+    setFormData({
+      tournamentId: "",
+      homeTeamId: "",
+      awayTeamId: "",
+      venueId: "",
+      refereeId: "",
+      matchDate: "",
+      matchTime: "",
+      round: "",
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (match) => {
+    setEditingMatch(match);
+
+    setFormData({
+      tournamentId: match.tournamentId,
+      homeTeamId: match.homeTeamId,
+      awayTeamId: match.awayTeamId,
+      venueId: match.venueId,
+      refereeId: match.refereeId,
+      matchDate: match.matchDate,
+      matchTime: match.matchTime,
+      round: match.round,
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingMatch(null);
   };
 
   const handleSubmit = (e) => {
@@ -217,42 +190,69 @@ function Matches() {
     }
 
     if (
-      formData.homeTeamId === formData.awayTeamId
+      Number(formData.homeTeamId) ===
+      Number(formData.awayTeamId)
     ) {
       alert(
-        "Home Team and Away Team cannot be the same."
+        "Home team and away team cannot be the same."
       );
       return;
     }
 
-    const matchData = {
-      tournamentId: Number(formData.tournamentId),
-      homeTeamId: Number(formData.homeTeamId),
-      awayTeamId: Number(formData.awayTeamId),
-      venueId: Number(formData.venueId),
-      refereeId: Number(formData.refereeId),
-      matchDate: formData.matchDate,
-      matchTime: formData.matchTime,
-      round: formData.round,
-    };
-
-    if (isEditing) {
+    if (editingMatch) {
       setMatches((previous) =>
         previous.map((match) =>
-          match.id === editingId
+          match.id === editingMatch.id
             ? {
                 ...match,
-                ...matchData,
+                tournamentId: Number(
+                  formData.tournamentId
+                ),
+                homeTeamId: Number(
+                  formData.homeTeamId
+                ),
+                awayTeamId: Number(
+                  formData.awayTeamId
+                ),
+                venueId: Number(
+                  formData.venueId
+                ),
+                refereeId: Number(
+                  formData.refereeId
+                ),
+                matchDate:
+                  formData.matchDate,
+                matchTime:
+                  formData.matchTime,
+                round: formData.round,
               }
             : match
         )
       );
 
-      alert("Fixture updated successfully.");
+      alert("Fixture updated successfully!");
     } else {
       const newMatch = {
         id: Date.now(),
-        ...matchData,
+        tournamentId: Number(
+          formData.tournamentId
+        ),
+        homeTeamId: Number(
+          formData.homeTeamId
+        ),
+        awayTeamId: Number(
+          formData.awayTeamId
+        ),
+        venueId: Number(formData.venueId),
+        refereeId: Number(
+          formData.refereeId
+        ),
+        matchDate: formData.matchDate,
+        matchTime: formData.matchTime,
+        round: formData.round,
+        createdAt: new Date()
+          .toISOString()
+          .split("T")[0],
       };
 
       setMatches((previous) => [
@@ -260,7 +260,7 @@ function Matches() {
         newMatch,
       ]);
 
-      alert("Fixture created successfully.");
+      alert("Fixture created successfully!");
     }
 
     closeModal();
@@ -274,217 +274,229 @@ function Matches() {
     if (!confirmed) return;
 
     setMatches((previous) =>
-      previous.filter((match) => match.id !== id)
+      previous.filter(
+        (match) => match.id !== id
+      )
     );
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingId(null);
-    setFormData(emptyForm);
-  };
+  const filteredMatches = matches.filter(
+    (match) => {
+      const search = searchTerm
+        .toLowerCase()
+        .trim();
+
+      const homeTeam = getTeamName(
+        match.homeTeamId
+      ).toLowerCase();
+
+      const awayTeam = getTeamName(
+        match.awayTeamId
+      ).toLowerCase();
+
+      const venue = getVenueName(
+        match.venueId
+      ).toLowerCase();
+
+      const matchesSearch =
+        homeTeam.includes(search) ||
+        awayTeam.includes(search) ||
+        venue.includes(search);
+
+      const matchesTournament =
+        tournamentFilter === "all" ||
+        match.tournamentId ===
+          Number(tournamentFilter);
+
+      const matchesRound =
+        roundFilter === "all" ||
+        match.round === roundFilter;
+
+      return (
+        matchesSearch &&
+        matchesTournament &&
+        matchesRound
+      );
+    }
+  );
+
+  const totalMatches = matches.length;
+
+  const groupStageMatches = matches.filter(
+    (match) => match.round === "Group Stage"
+  ).length;
+
+  const knockoutMatches = matches.filter(
+    (match) =>
+      match.round === "Semi Final" ||
+      match.round === "Final"
+  ).length;
 
   return (
     <div className="page">
 
-      {/* HEADER */}
+      {/* PAGE HEADER */}
       <div className="page-header">
+
         <div>
           <h1>Match / Fixture Management</h1>
+
           <p>
-            Create and manage tournament match fixtures
+            Create and manage tournament
+            fixtures.
           </p>
         </div>
 
+        {/* ONLY ONE CREATE FIXTURE BUTTON */}
         <button
-          type="button"
           className="primary-btn"
-          onClick={handleAdd}
+          onClick={openAddModal}
         >
           + Create Fixture
         </button>
+
       </div>
 
-      {/* STATS */}
-      <div className="stats">
+      {/* SUMMARY */}
+      <div className="summary-grid">
 
-        <div className="card">
-          <div className="card-top">
-            <span>Total Matches</span>
-            <div className="card-icon">⚽</div>
+        <div className="summary-card">
+          <div className="summary-icon">
+            🏟️
           </div>
 
-          <h3>{matches.length}</h3>
-          <small>Scheduled fixtures</small>
+          <div>
+            <h3>{totalMatches}</h3>
+            <p>Total Matches</p>
+          </div>
         </div>
 
-        <div className="card">
-          <div className="card-top">
-            <span>Venues Used</span>
-            <div className="card-icon">🏟️</div>
+        <div className="summary-card">
+          <div className="summary-icon">
+            📋
           </div>
 
-          <h3>
-            {new Set(
-              matches.map((match) => match.venueId)
-            ).size}
-          </h3>
-
-          <small>Assigned venues</small>
+          <div>
+            <h3>{groupStageMatches}</h3>
+            <p>Group Stage</p>
+          </div>
         </div>
 
-        <div className="card">
-          <div className="card-top">
-            <span>Referees</span>
-            <div className="card-icon">🧑‍⚖️</div>
+        <div className="summary-card">
+          <div className="summary-icon">
+            🏆
           </div>
 
-          <h3>
-            {new Set(
-              matches.map(
-                (match) => match.refereeId
-              )
-            ).size}
-          </h3>
-
-          <small>Assigned referees</small>
-        </div>
-
-        <div className="card">
-          <div className="card-top">
-            <span>Tournaments</span>
-            <div className="card-icon">🏆</div>
+          <div>
+            <h3>{knockoutMatches}</h3>
+            <p>Knockout Matches</p>
           </div>
-
-          <h3>{tournaments.length}</h3>
-          <small>Available tournaments</small>
         </div>
 
       </div>
 
-      {/* TOOLBAR */}
+      {/* SEARCH + FILTERS */}
       <div className="toolbar">
 
         <input
-          type="search"
+          type="text"
           className="search-input"
-          placeholder="Search tournament, team, venue..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search team or venue..."
+          value={searchTerm}
+          onChange={(e) =>
+            setSearchTerm(e.target.value)
+          }
         />
 
-        <button
-          type="button"
-          className="primary-btn"
-          onClick={handleAdd}
+        <select
+          value={tournamentFilter}
+          onChange={(e) =>
+            setTournamentFilter(
+              e.target.value
+            )
+          }
+          style={{
+            padding: "12px 15px",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            fontSize: "15px",
+            background: "white",
+            outline: "none",
+          }}
         >
-          + Create Fixture
-        </button>
+          <option value="all">
+            All Tournaments
+          </option>
+
+          {tournaments.map((tournament) => (
+            <option
+              key={tournament.id}
+              value={tournament.id}
+            >
+              {tournament.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={roundFilter}
+          onChange={(e) =>
+            setRoundFilter(e.target.value)
+          }
+          style={{
+            padding: "12px 15px",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            fontSize: "15px",
+            background: "white",
+            outline: "none",
+          }}
+        >
+          <option value="all">
+            All Rounds
+          </option>
+
+          <option value="Group Stage">
+            Group Stage
+          </option>
+
+          <option value="Quarter Final">
+            Quarter Final
+          </option>
+
+          <option value="Semi Final">
+            Semi Final
+          </option>
+
+          <option value="Final">
+            Final
+          </option>
+        </select>
 
       </div>
 
-      {/* TABLE */}
+      {/* MATCH TABLE */}
       <div className="table-container">
 
         <table>
 
           <thead>
             <tr>
-              <th>ID</th>
+              <th>#</th>
               <th>Tournament</th>
-              <th>Teams</th>
+              <th>Match</th>
               <th>Venue</th>
               <th>Date</th>
               <th>Time</th>
               <th>Round</th>
               <th>Referee</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
 
           <tbody>
 
-            {filteredMatches.length > 0 ? (
-              filteredMatches.map((match) => (
-                <tr key={match.id}>
-
-                  <td>#{match.id}</td>
-
-                  <td>
-                    <strong>
-                      {getTournamentName(
-                        match.tournamentId
-                      )}
-                    </strong>
-                  </td>
-
-                  <td>
-                    <div className="match-teams">
-                      <span>
-                        {getTeamName(
-                          match.homeTeamId
-                        )}
-                      </span>
-
-                      <strong>VS</strong>
-
-                      <span>
-                        {getTeamName(
-                          match.awayTeamId
-                        )}
-                      </span>
-                    </div>
-                  </td>
-
-                  <td>
-                    {getVenueName(match.venueId)}
-                  </td>
-
-                  <td>{match.matchDate}</td>
-
-                  <td>{match.matchTime}</td>
-
-                  <td>
-                    <span className="match-round">
-                      {match.round}
-                    </span>
-                  </td>
-
-                  <td>
-                    {getRefereeName(
-                      match.refereeId
-                    )}
-                  </td>
-
-                  <td>
-                    <div className="action-buttons">
-
-                      <button
-                        type="button"
-                        className="edit-btn"
-                        onClick={() =>
-                          handleEdit(match)
-                        }
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        type="button"
-                        className="delete-btn"
-                        onClick={() =>
-                          handleDelete(match.id)
-                        }
-                      >
-                        Delete
-                      </button>
-
-                    </div>
-                  </td>
-
-                </tr>
-              ))
-            ) : (
+            {filteredMatches.length === 0 ? (
               <tr>
                 <td
                   colSpan="9"
@@ -493,6 +505,90 @@ function Matches() {
                   No matches found.
                 </td>
               </tr>
+            ) : (
+              filteredMatches.map(
+                (match, index) => (
+                  <tr key={match.id}>
+
+                    <td>{index + 1}</td>
+
+                    <td>
+                      {getTournamentName(
+                        match.tournamentId
+                      )}
+                    </td>
+
+                    <td>
+                      <strong>
+                        {getTeamName(
+                          match.homeTeamId
+                        )}
+                      </strong>
+
+                      <span> vs </span>
+
+                      <strong>
+                        {getTeamName(
+                          match.awayTeamId
+                        )}
+                      </strong>
+                    </td>
+
+                    <td>
+                      {getVenueName(
+                        match.venueId
+                      )}
+                    </td>
+
+                    <td>
+                      {match.matchDate}
+                    </td>
+
+                    <td>
+                      {match.matchTime}
+                    </td>
+
+                    <td>
+                      {match.round}
+                    </td>
+
+                    <td>
+                      {getRefereeName(
+                        match.refereeId
+                      )}
+                    </td>
+
+                    <td>
+                      <div className="action-buttons">
+
+                        <button
+                          className="edit-btn"
+                          onClick={() =>
+                            openEditModal(
+                              match
+                            )
+                          }
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className="delete-btn"
+                          onClick={() =>
+                            handleDelete(
+                              match.id
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+
+                      </div>
+                    </td>
+
+                  </tr>
+                )
+              )
             )}
 
           </tbody>
@@ -501,8 +597,8 @@ function Matches() {
 
       </div>
 
-      {/* MODAL */}
-      {showModal && (
+      {/* ADD / EDIT FIXTURE MODAL */}
+      {isModalOpen && (
         <div className="modal-overlay">
 
           <div className="modal match-modal">
@@ -511,18 +607,19 @@ function Matches() {
 
               <div>
                 <h2>
-                  {isEditing
+                  {editingMatch
                     ? "Edit Fixture"
-                    : "Create New Fixture"}
+                    : "Create Fixture"}
                 </h2>
 
                 <p>
-                  Enter match information below
+                  {editingMatch
+                    ? "Update fixture information."
+                    : "Create a new tournament fixture."}
                 </p>
               </div>
 
               <button
-                type="button"
                 className="close-btn"
                 onClick={closeModal}
               >
@@ -536,166 +633,187 @@ function Matches() {
               onSubmit={handleSubmit}
             >
 
-              {/* TOURNAMENT */}
               <div className="form-group">
+
                 <label>Tournament</label>
 
                 <select
                   name="tournamentId"
-                  value={formData.tournamentId}
+                  value={
+                    formData.tournamentId
+                  }
                   onChange={handleChange}
-                  required
                 >
                   <option value="">
                     Select Tournament
                   </option>
 
-                  {tournaments.map((item) => (
-                    <option
-                      key={item.id}
-                      value={item.id}
-                    >
-                      {item.name}
-                    </option>
-                  ))}
+                  {tournaments.map(
+                    (tournament) => (
+                      <option
+                        key={tournament.id}
+                        value={tournament.id}
+                      >
+                        {tournament.name}
+                      </option>
+                    )
+                  )}
+
                 </select>
+
               </div>
 
-              {/* HOME TEAM */}
               <div className="form-group">
+
                 <label>Home Team</label>
 
                 <select
                   name="homeTeamId"
-                  value={formData.homeTeamId}
+                  value={
+                    formData.homeTeamId
+                  }
                   onChange={handleChange}
-                  required
                 >
                   <option value="">
                     Select Home Team
                   </option>
 
-                  {teams.map((item) => (
+                  {teams.map((team) => (
                     <option
-                      key={item.id}
-                      value={item.id}
+                      key={team.id}
+                      value={team.id}
                     >
-                      {item.name}
+                      {team.name}
                     </option>
                   ))}
+
                 </select>
+
               </div>
 
-              {/* AWAY TEAM */}
               <div className="form-group">
+
                 <label>Away Team</label>
 
                 <select
                   name="awayTeamId"
-                  value={formData.awayTeamId}
+                  value={
+                    formData.awayTeamId
+                  }
                   onChange={handleChange}
-                  required
                 >
                   <option value="">
                     Select Away Team
                   </option>
 
-                  {teams.map((item) => (
+                  {teams.map((team) => (
                     <option
-                      key={item.id}
-                      value={item.id}
+                      key={team.id}
+                      value={team.id}
                     >
-                      {item.name}
+                      {team.name}
                     </option>
                   ))}
+
                 </select>
+
               </div>
 
-              {/* VENUE */}
               <div className="form-group">
+
                 <label>Venue</label>
 
                 <select
                   name="venueId"
                   value={formData.venueId}
                   onChange={handleChange}
-                  required
                 >
                   <option value="">
                     Select Venue
                   </option>
 
-                  {venues.map((item) => (
+                  {venues.map((venue) => (
                     <option
-                      key={item.id}
-                      value={item.id}
+                      key={venue.id}
+                      value={venue.id}
                     >
-                      {item.name}
+                      {venue.name}
                     </option>
                   ))}
+
                 </select>
+
               </div>
 
-              {/* REFEREE */}
               <div className="form-group">
+
                 <label>Referee</label>
 
                 <select
                   name="refereeId"
-                  value={formData.refereeId}
+                  value={
+                    formData.refereeId
+                  }
                   onChange={handleChange}
-                  required
                 >
                   <option value="">
                     Select Referee
                   </option>
 
-                  {referees.map((item) => (
-                    <option
-                      key={item.id}
-                      value={item.id}
-                    >
-                      {item.name}
-                    </option>
-                  ))}
+                  {referees.map(
+                    (referee) => (
+                      <option
+                        key={referee.id}
+                        value={referee.id}
+                      >
+                        {referee.name}
+                      </option>
+                    )
+                  )}
+
                 </select>
+
               </div>
 
-              {/* DATE */}
               <div className="form-group">
+
                 <label>Match Date</label>
 
                 <input
                   type="date"
                   name="matchDate"
-                  value={formData.matchDate}
+                  value={
+                    formData.matchDate
+                  }
                   onChange={handleChange}
-                  required
                 />
+
               </div>
 
-              {/* TIME */}
               <div className="form-group">
+
                 <label>Match Time</label>
 
                 <input
-                  type="time"
+                  type="text"
                   name="matchTime"
-                  value={formData.matchTime}
+                  placeholder="Example: 04:00 PM"
+                  value={
+                    formData.matchTime
+                  }
                   onChange={handleChange}
-                  required
                 />
+
               </div>
 
-              {/* ROUND */}
               <div className="form-group">
+
                 <label>Round</label>
 
                 <select
                   name="round"
                   value={formData.round}
                   onChange={handleChange}
-                  required
                 >
                   <option value="">
                     Select Round
@@ -716,11 +834,12 @@ function Matches() {
                   <option value="Final">
                     Final
                   </option>
+
                 </select>
+
               </div>
 
-              {/* BUTTONS */}
-              <div className="match-form-actions">
+              <div className="modal-actions">
 
                 <button
                   type="button"
@@ -732,9 +851,9 @@ function Matches() {
 
                 <button
                   type="submit"
-                  className="primary-btn create-fixture-btn"
+                  className="primary-btn"
                 >
-                  {isEditing
+                  {editingMatch
                     ? "Update Fixture"
                     : "Create Fixture"}
                 </button>

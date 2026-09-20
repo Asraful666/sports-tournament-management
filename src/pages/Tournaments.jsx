@@ -4,117 +4,275 @@ function Tournaments() {
   const [tournaments, setTournaments] = useState([
     {
       id: 1,
-      name: "University Football Championship 2026",
-      description: "Annual university football tournament",
+      name: "SIU Football Championship 2026",
+      description: "University inter-department football tournament.",
       startDate: "2026-10-01",
       endDate: "2026-10-20",
-      organizer: "Admin User",
-      status: "Upcoming",
+      organizer: "Sports Committee",
+      createdAt: "2026-08-10",
     },
     {
       id: 2,
-      name: "Inter Department Cricket Cup 2026",
-      description: "Inter department cricket competition",
-      startDate: "2026-09-25",
-      endDate: "2026-10-10",
-      organizer: "Admin User",
-      status: "Upcoming",
+      name: "Inter Department Cricket Cup",
+      description: "Annual cricket tournament.",
+      startDate: "2026-11-05",
+      endDate: "2026-11-25",
+      organizer: "CSE Department",
+      createdAt: "2026-08-12",
     },
     {
       id: 3,
-      name: "Summer Football League",
-      description: "Summer season football league",
+      name: "University Basketball League",
+      description: "Basketball competition between university teams.",
       startDate: "2026-07-01",
-      endDate: "2026-07-30",
-      organizer: "Tournament Organizer",
-      status: "Completed",
+      endDate: "2026-07-20",
+      organizer: "Sports Club",
+      createdAt: "2026-07-01",
     },
   ]);
 
-  const [showModal, setShowModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
 
-  const [search, setSearch] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [editingTournament, setEditingTournament] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     startDate: "",
     endDate: "",
+    organizer: "",
   });
 
+  // =========================
+  // TOURNAMENT STATUS
+  // =========================
 
-  // Search
-  const filteredTournaments = tournaments.filter((tournament) =>
-    tournament.name
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  const getStatus = (startDate, endDate) => {
+    const today = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
+    if (today < start) {
+      return "Upcoming";
+    }
 
-  // Input change
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    if (today > end) {
+      return "Completed";
+    }
+
+    return "Ongoing";
   };
 
+  // =========================
+  // INPUT CHANGE
+  // =========================
 
-  // Create tournament
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-    const newTournament = {
-      id: Date.now(),
-      name: formData.name,
-      description: formData.description,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-      organizer: "Admin User",
-      status: "Upcoming",
-    };
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
 
-    setTournaments([
-      newTournament,
-      ...tournaments,
-    ]);
+  // =========================
+  // ADD
+  // =========================
+
+  const handleAdd = () => {
+    setEditingTournament(null);
 
     setFormData({
       name: "",
       description: "",
       startDate: "",
       endDate: "",
+      organizer: "",
     });
 
-    setShowModal(false);
+    setShowModal(true);
   };
 
+  // =========================
+  // EDIT
+  // =========================
 
-  // Delete tournament
+  const handleEdit = (tournament) => {
+    setEditingTournament(tournament);
+
+    setFormData({
+      name: tournament.name,
+      description: tournament.description,
+      startDate: tournament.startDate,
+      endDate: tournament.endDate,
+      organizer: tournament.organizer,
+    });
+
+    setShowModal(true);
+  };
+
+  // =========================
+  // CLOSE
+  // =========================
+
+  const handleClose = () => {
+    setShowModal(false);
+    setEditingTournament(null);
+  };
+
+  // =========================
+  // SAVE
+  // =========================
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (
+      !formData.name ||
+      !formData.description ||
+      !formData.startDate ||
+      !formData.endDate ||
+      !formData.organizer
+    ) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    if (
+      new Date(formData.endDate) <
+      new Date(formData.startDate)
+    ) {
+      alert("End date cannot be before start date.");
+      return;
+    }
+
+    if (editingTournament) {
+      setTournaments((previous) =>
+        previous.map((tournament) =>
+          tournament.id === editingTournament.id
+            ? {
+                ...tournament,
+                ...formData,
+              }
+            : tournament
+        )
+      );
+
+      alert("Tournament updated successfully!");
+    } else {
+      const newTournament = {
+        id: Date.now(),
+        ...formData,
+        createdAt: new Date()
+          .toISOString()
+          .split("T")[0],
+      };
+
+      setTournaments((previous) => [
+        ...previous,
+        newTournament,
+      ]);
+
+      alert("Tournament added successfully!");
+    }
+
+    handleClose();
+  };
+
+  // =========================
+  // DELETE
+  // =========================
+
   const handleDelete = (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this tournament?"
     );
 
-    if (confirmDelete) {
-      setTournaments(
-        tournaments.filter(
-          (tournament) => tournament.id !== id
-        )
-      );
-    }
+    if (!confirmDelete) return;
+
+    setTournaments((previous) =>
+      previous.filter(
+        (tournament) => tournament.id !== id
+      )
+    );
+
+    alert("Tournament deleted successfully!");
   };
 
+  // =========================
+  // SEARCH + FILTER
+  // =========================
+
+  const filteredTournaments = tournaments.filter(
+    (tournament) => {
+      const search = searchTerm.toLowerCase();
+
+      const matchesSearch =
+        tournament.name
+          .toLowerCase()
+          .includes(search) ||
+        tournament.description
+          .toLowerCase()
+          .includes(search) ||
+        tournament.organizer
+          .toLowerCase()
+          .includes(search);
+
+      const status = getStatus(
+        tournament.startDate,
+        tournament.endDate
+      );
+
+      const matchesStatus =
+        statusFilter === "All" ||
+        statusFilter === status;
+
+      return matchesSearch && matchesStatus;
+    }
+  );
+
+  // =========================
+  // SUMMARY
+  // =========================
+
+  const total = tournaments.length;
+
+  const upcoming = tournaments.filter(
+    (tournament) =>
+      getStatus(
+        tournament.startDate,
+        tournament.endDate
+      ) === "Upcoming"
+  ).length;
+
+  const ongoing = tournaments.filter(
+    (tournament) =>
+      getStatus(
+        tournament.startDate,
+        tournament.endDate
+      ) === "Ongoing"
+  ).length;
+
+  const completed = tournaments.filter(
+    (tournament) =>
+      getStatus(
+        tournament.startDate,
+        tournament.endDate
+      ) === "Completed"
+  ).length;
 
   return (
-    <div>
+    <div className="page-container">
 
-      {/* Page Heading */}
+      {/* HEADER */}
 
-      <div className="page-title">
+      <div className="page-header">
 
         <div>
-          <h2>Tournaments</h2>
+          <h1>Tournament Management</h1>
 
           <p>
             Create and manage sports tournaments.
@@ -123,69 +281,76 @@ function Tournaments() {
 
         <button
           className="primary-btn"
-          onClick={() => setShowModal(true)}
+          onClick={handleAdd}
         >
-          + Create Tournament
+          + Add Tournament
         </button>
 
       </div>
 
-
-      {/* Summary */}
+      {/* SUMMARY */}
 
       <div className="tournament-summary">
 
         <div className="summary-card">
           <span>Total Tournaments</span>
-          <strong>{tournaments.length}</strong>
+          <strong>{total}</strong>
         </div>
 
         <div className="summary-card">
           <span>Upcoming</span>
-          <strong>
-            {
-              tournaments.filter(
-                (t) => t.status === "Upcoming"
-              ).length
-            }
-          </strong>
+          <strong>{upcoming}</strong>
         </div>
 
         <div className="summary-card">
           <span>Completed</span>
-          <strong>
-            {
-              tournaments.filter(
-                (t) => t.status === "Completed"
-              ).length
-            }
-          </strong>
+          <strong>{completed}</strong>
         </div>
 
       </div>
 
-
-      {/* Search */}
+      {/* TOOLBAR */}
 
       <div className="tournament-toolbar">
 
         <div className="tournament-search">
 
-          <span>⌕</span>
+          <span>🔎</span>
 
           <input
             type="text"
-            placeholder="Search tournaments..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search tournament..."
+            value={searchTerm}
+            onChange={(e) =>
+              setSearchTerm(e.target.value)
+            }
           />
 
         </div>
 
+        <select
+          value={statusFilter}
+          onChange={(e) =>
+            setStatusFilter(e.target.value)
+          }
+          style={{
+            border: "1px solid #e5e7eb",
+            borderRadius: "7px",
+            padding: "0 10px",
+            outline: "none",
+            fontSize: "12px",
+            background: "white",
+          }}
+        >
+          <option value="All">All Status</option>
+          <option value="Upcoming">Upcoming</option>
+          <option value="Ongoing">Ongoing</option>
+          <option value="Completed">Completed</option>
+        </select>
+
       </div>
 
-
-      {/* Tournament List */}
+      {/* TABLE */}
 
       <div className="tournament-table">
 
@@ -195,7 +360,7 @@ function Tournaments() {
             <h3>Tournament List</h3>
 
             <p>
-              Manage all registered tournaments.
+              Manage all registered tournaments
             </p>
           </div>
 
@@ -205,125 +370,134 @@ function Tournaments() {
 
         </div>
 
-
         <div className="table-container">
 
           <table>
 
             <thead>
-
               <tr>
+                <th>#</th>
                 <th>Tournament</th>
+                <th>Organizer</th>
                 <th>Start Date</th>
                 <th>End Date</th>
-                <th>Organizer</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
-
             </thead>
-
 
             <tbody>
 
-              {filteredTournaments.length > 0 ? (
-
-                filteredTournaments.map((tournament) => (
-
-                  <tr key={tournament.id}>
-
-                    <td>
-
-                      <div className="tournament-name">
-
-                        <div className="tournament-icon">
-                          🏆
-                        </div>
-
-                        <div>
-
-                          <strong>
-                            {tournament.name}
-                          </strong>
-
-                          <small>
-                            {tournament.description}
-                          </small>
-
-                        </div>
-
-                      </div>
-
-                    </td>
-
-
-                    <td>
-                      {tournament.startDate}
-                    </td>
-
-
-                    <td>
-                      {tournament.endDate}
-                    </td>
-
-
-                    <td>
-                      {tournament.organizer}
-                    </td>
-
-
-                    <td>
-
-                      <span
-                        className={
-                          tournament.status === "Upcoming"
-                            ? "status upcoming"
-                            : "status completed"
-                        }
-                      >
-                        {tournament.status}
-                      </span>
-
-                    </td>
-
-
-                    <td>
-
-                      <div className="action-buttons">
-
-                        <button className="edit-btn">
-                          Edit
-                        </button>
-
-                        <button
-                          className="delete-btn"
-                          onClick={() =>
-                            handleDelete(tournament.id)
-                          }
-                        >
-                          Delete
-                        </button>
-
-                      </div>
-
-                    </td>
-
-                  </tr>
-
-                ))
-
-              ) : (
+              {filteredTournaments.length === 0 ? (
 
                 <tr>
-
                   <td
-                    colSpan="6"
-                    className="no-data"
+                    colSpan="7"
+                    style={{
+                      textAlign: "center",
+                      padding: "30px",
+                      color: "#9ca3af",
+                    }}
                   >
                     No tournaments found.
                   </td>
-
                 </tr>
+
+              ) : (
+
+                filteredTournaments.map(
+                  (tournament, index) => {
+
+                    const status = getStatus(
+                      tournament.startDate,
+                      tournament.endDate
+                    );
+
+                    return (
+                      <tr key={tournament.id}>
+
+                        <td>
+                          {index + 1}
+                        </td>
+
+                        <td>
+
+                          <div className="tournament-name">
+
+                            <div className="tournament-icon">
+                              🏆
+                            </div>
+
+                            <div>
+
+                              <strong>
+                                {tournament.name}
+                              </strong>
+
+                              <small>
+                                {tournament.description}
+                              </small>
+
+                            </div>
+
+                          </div>
+
+                        </td>
+
+                        <td>
+                          {tournament.organizer}
+                        </td>
+
+                        <td>
+                          {tournament.startDate}
+                        </td>
+
+                        <td>
+                          {tournament.endDate}
+                        </td>
+
+                        <td>
+
+                          <span
+                            className={`status ${status.toLowerCase()}`}
+                          >
+                            {status}
+                          </span>
+
+                        </td>
+
+                        <td>
+
+                          <div className="action-buttons">
+
+                            <button
+                              className="edit-btn"
+                              onClick={() =>
+                                handleEdit(tournament)
+                              }
+                            >
+                              Edit
+                            </button>
+
+                            <button
+                              className="delete-btn"
+                              onClick={() =>
+                                handleDelete(
+                                  tournament.id
+                                )
+                              }
+                            >
+                              Delete
+                            </button>
+
+                          </div>
+
+                        </td>
+
+                      </tr>
+                    );
+                  }
+                )
 
               )}
 
@@ -335,8 +509,7 @@ function Tournaments() {
 
       </div>
 
-
-      {/* Create Tournament Modal */}
+      {/* MODAL */}
 
       {showModal && (
 
@@ -347,22 +520,27 @@ function Tournaments() {
             <div className="modal-header">
 
               <div>
-                <h3>Create Tournament</h3>
+
+                <h2>
+                  {editingTournament
+                    ? "Edit Tournament"
+                    : "Add Tournament"}
+                </h2>
 
                 <p>
-                  Add a new sports tournament.
+                  Enter tournament information.
                 </p>
+
               </div>
 
               <button
                 className="close-btn"
-                onClick={() => setShowModal(false)}
+                onClick={handleClose}
               >
                 ×
               </button>
 
             </div>
-
 
             <form onSubmit={handleSubmit}>
 
@@ -375,14 +553,12 @@ function Tournaments() {
                 <input
                   type="text"
                   name="name"
-                  placeholder="Enter tournament name"
                   value={formData.name}
                   onChange={handleChange}
-                  required
+                  placeholder="Enter tournament name"
                 />
 
               </div>
-
 
               <div className="form-group">
 
@@ -392,14 +568,13 @@ function Tournaments() {
 
                 <textarea
                   name="description"
-                  placeholder="Enter tournament description"
                   value={formData.description}
                   onChange={handleChange}
+                  placeholder="Enter tournament description"
                   rows="3"
                 />
 
               </div>
-
 
               <div className="form-row">
 
@@ -414,11 +589,9 @@ function Tournaments() {
                     name="startDate"
                     value={formData.startDate}
                     onChange={handleChange}
-                    required
                   />
 
                 </div>
-
 
                 <div className="form-group">
 
@@ -431,20 +604,34 @@ function Tournaments() {
                     name="endDate"
                     value={formData.endDate}
                     onChange={handleChange}
-                    required
                   />
 
                 </div>
 
               </div>
 
+              <div className="form-group">
+
+                <label>
+                  Organizer
+                </label>
+
+                <input
+                  type="text"
+                  name="organizer"
+                  value={formData.organizer}
+                  onChange={handleChange}
+                  placeholder="Enter organizer"
+                />
+
+              </div>
 
               <div className="modal-actions">
 
                 <button
                   type="button"
                   className="cancel-btn"
-                  onClick={() => setShowModal(false)}
+                  onClick={handleClose}
                 >
                   Cancel
                 </button>
@@ -453,7 +640,9 @@ function Tournaments() {
                   type="submit"
                   className="primary-btn"
                 >
-                  Create Tournament
+                  {editingTournament
+                    ? "Update Tournament"
+                    : "Add Tournament"}
                 </button>
 
               </div>

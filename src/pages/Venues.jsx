@@ -1,59 +1,186 @@
 import { useState } from "react";
 
-const initialVenues = [
-  {
-    id: 1,
-    name: "University Football Ground",
-    location: "Sylhet International University",
-    capacity: 5000,
-    createdAt: "2026-09-01",
-    available: true,
-  },
-  {
-    id: 2,
-    name: "University Cricket Ground",
-    location: "Main Campus",
-    capacity: 3000,
-    createdAt: "2026-09-03",
-    available: true,
-  },
-  {
-    id: 3,
-    name: "Indoor Sports Complex",
-    location: "University Campus",
-    capacity: 1000,
-    createdAt: "2026-09-05",
-    available: false,
-  },
-];
-
-const emptyForm = {
-  name: "",
-  location: "",
-  capacity: "",
-  available: true,
-};
-
 function Venues() {
-  const [venues, setVenues] = useState(initialVenues);
-  const [search, setSearch] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState(emptyForm);
+  const [venues, setVenues] = useState([
+    {
+      id: 1,
+      name: "SIU Main Ground",
+      location: "Sylhet International University",
+      capacity: 5000,
+      available: true,
+      createdAt: "2026-08-10",
+    },
+    {
+      id: 2,
+      name: "University Indoor Hall",
+      location: "Sylhet",
+      capacity: 1500,
+      available: true,
+      createdAt: "2026-08-12",
+    },
+    {
+      id: 3,
+      name: "City Sports Complex",
+      location: "Sylhet City",
+      capacity: 3000,
+      available: false,
+      createdAt: "2026-08-15",
+    },
+  ]);
 
-  const isEditing = editingId !== null;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] =
+    useState("all");
 
-  // Search venues
-  const filteredVenues = venues.filter((venue) => {
-    const searchText = search.toLowerCase();
+  const [isModalOpen, setIsModalOpen] =
+    useState(false);
 
-    return (
-      venue.name.toLowerCase().includes(searchText) ||
-      venue.location.toLowerCase().includes(searchText)
-    );
+  const [editingVenue, setEditingVenue] =
+    useState(null);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    location: "",
+    capacity: "",
+    available: true,
   });
 
-  // Statistics
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const openAddModal = () => {
+    setEditingVenue(null);
+
+    setFormData({
+      name: "",
+      location: "",
+      capacity: "",
+      available: true,
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (venue) => {
+    setEditingVenue(venue);
+
+    setFormData({
+      name: venue.name,
+      location: venue.location,
+      capacity: venue.capacity,
+      available: venue.available,
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingVenue(null);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (
+      !formData.name ||
+      !formData.location ||
+      !formData.capacity
+    ) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    if (editingVenue) {
+      setVenues((previous) =>
+        previous.map((venue) =>
+          venue.id === editingVenue.id
+            ? {
+                ...venue,
+                name: formData.name,
+                location: formData.location,
+                capacity: Number(
+                  formData.capacity
+                ),
+                available:
+                  formData.available === true ||
+                  formData.available === "true",
+              }
+            : venue
+        )
+      );
+
+      alert("Venue updated successfully!");
+    } else {
+      const newVenue = {
+        id: Date.now(),
+        name: formData.name,
+        location: formData.location,
+        capacity: Number(formData.capacity),
+        available:
+          formData.available === true ||
+          formData.available === "true",
+        createdAt: new Date()
+          .toISOString()
+          .split("T")[0],
+      };
+
+      setVenues((previous) => [
+        ...previous,
+        newVenue,
+      ]);
+
+      alert("Venue added successfully!");
+    }
+
+    closeModal();
+  };
+
+  const handleDelete = (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this venue?"
+    );
+
+    if (!confirmed) return;
+
+    setVenues((previous) =>
+      previous.filter((venue) => venue.id !== id)
+    );
+  };
+
+  const filteredVenues = venues.filter(
+    (venue) => {
+      const search = searchTerm
+        .toLowerCase()
+        .trim();
+
+      const matchesSearch =
+        venue.name
+          .toLowerCase()
+          .includes(search) ||
+        venue.location
+          .toLowerCase()
+          .includes(search);
+
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "available" &&
+          venue.available) ||
+        (statusFilter === "unavailable" &&
+          !venue.available);
+
+      return (
+        matchesSearch && matchesStatus
+      );
+    }
+  );
+
   const totalVenues = venues.length;
 
   const availableVenues = venues.filter(
@@ -64,327 +191,139 @@ function Venues() {
     (venue) => !venue.available
   ).length;
 
-  // Open Add Modal
-  const handleAdd = () => {
-    setEditingId(null);
-    setFormData(emptyForm);
-    setShowModal(true);
-  };
-
-  // Open Edit Modal
-  const handleEdit = (venue) => {
-    setEditingId(venue.id);
-
-    setFormData({
-      name: venue.name,
-      location: venue.location,
-      capacity: String(venue.capacity),
-      available: venue.available,
-    });
-
-    setShowModal(true);
-  };
-
-  // Input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-  };
-
-  // Add / Update venue
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (isEditing) {
-      setVenues((previous) =>
-        previous.map((venue) =>
-          venue.id === editingId
-            ? {
-                ...venue,
-                name: formData.name,
-                location: formData.location,
-                capacity: Number(formData.capacity),
-                available: formData.available,
-              }
-            : venue
-        )
-      );
-    } else {
-      const newVenue = {
-        id: Date.now(),
-        name: formData.name,
-        location: formData.location,
-        capacity: Number(formData.capacity),
-        available: formData.available,
-        createdAt: new Date()
-          .toISOString()
-          .split("T")[0],
-      };
-
-      setVenues((previous) => [
-        ...previous,
-        newVenue,
-      ]);
-    }
-
-    closeModal();
-  };
-
-  // Delete venue
-  const handleDelete = (id) => {
-    const venue = venues.find(
-      (item) => item.id === id
-    );
-
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${
-        venue?.name || "this venue"
-      }?`
-    );
-
-    if (!confirmed) return;
-
-    setVenues((previous) =>
-      previous.filter(
-        (venue) => venue.id !== id
-      )
-    );
-  };
-
-  // Toggle availability
-  const toggleAvailability = (id) => {
-    setVenues((previous) =>
-      previous.map((venue) =>
-        venue.id === id
-          ? {
-              ...venue,
-              available: !venue.available,
-            }
-          : venue
-      )
-    );
-  };
-
-  // Close modal
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingId(null);
-    setFormData(emptyForm);
-  };
+  const totalCapacity = venues.reduce(
+    (total, venue) =>
+      total + Number(venue.capacity),
+    0
+  );
 
   return (
     <div className="page">
 
-      {/* Page Header */}
+      {/* PAGE HEADER */}
       <div className="page-header">
+
         <div>
           <h1>Venue Management</h1>
+
           <p>
-            Add and manage tournament venues
+            Manage tournament venues and
+            availability.
           </p>
         </div>
 
+        {/* ONLY ONE ADD VENUE BUTTON */}
         <button
           className="primary-btn"
-          onClick={handleAdd}
+          onClick={openAddModal}
         >
           + Add Venue
         </button>
+
       </div>
 
-      {/* Statistics */}
-      <div className="stats">
+      {/* SUMMARY CARDS */}
+      <div className="summary-grid">
 
-        <div className="card">
-          <div className="card-top">
-            <span>Total Venues</span>
-
-            <div className="card-icon">
-              🏟️
-            </div>
+        <div className="summary-card">
+          <div className="summary-icon">
+            🏟️
           </div>
 
-          <h3>{totalVenues}</h3>
-
-          <small>
-            Registered venues
-          </small>
+          <div>
+            <h3>{totalVenues}</h3>
+            <p>Total Venues</p>
+          </div>
         </div>
 
-        <div className="card">
-          <div className="card-top">
-            <span>Available</span>
-
-            <div className="card-icon">
-              ✅
-            </div>
+        <div className="summary-card">
+          <div className="summary-icon">
+            ✅
           </div>
 
-          <h3>{availableVenues}</h3>
-
-          <small>
-            Currently available
-          </small>
+          <div>
+            <h3>{availableVenues}</h3>
+            <p>Available</p>
+          </div>
         </div>
 
-        <div className="card">
-          <div className="card-top">
-            <span>Unavailable</span>
-
-            <div className="card-icon">
-              ❌
-            </div>
+        <div className="summary-card">
+          <div className="summary-icon">
+            👥
           </div>
 
-          <h3>{unavailableVenues}</h3>
-
-          <small>
-            Currently unavailable
-          </small>
-        </div>
-
-        <div className="card">
-          <div className="card-top">
-            <span>Total Capacity</span>
-
-            <div className="card-icon">
-              👥
-            </div>
+          <div>
+            <h3>
+              {totalCapacity.toLocaleString()}
+            </h3>
+            <p>Total Capacity</p>
           </div>
-
-          <h3>
-            {venues.reduce(
-              (total, venue) =>
-                total + venue.capacity,
-              0
-            )}
-          </h3>
-
-          <small>
-            Combined capacity
-          </small>
         </div>
 
       </div>
 
-      {/* Search Toolbar */}
+      {/* SEARCH + FILTER */}
       <div className="toolbar">
 
         <input
-          type="search"
+          type="text"
           className="search-input"
           placeholder="Search venue or location..."
-          value={search}
+          value={searchTerm}
           onChange={(e) =>
-            setSearch(e.target.value)
+            setSearchTerm(e.target.value)
           }
         />
 
-        <button
-          className="primary-btn"
-          onClick={handleAdd}
+        <select
+          value={statusFilter}
+          onChange={(e) =>
+            setStatusFilter(e.target.value)
+          }
+          style={{
+            padding: "12px 15px",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            fontSize: "15px",
+            background: "white",
+            outline: "none",
+          }}
         >
-          + Add Venue
-        </button>
+          <option value="all">
+            All Status
+          </option>
+
+          <option value="available">
+            Available
+          </option>
+
+          <option value="unavailable">
+            Unavailable
+          </option>
+        </select>
 
       </div>
 
-      {/* Venue Table */}
+      {/* VENUE TABLE */}
       <div className="table-container">
 
         <table>
 
           <thead>
             <tr>
-              <th>ID</th>
+              <th>#</th>
               <th>Venue Name</th>
               <th>Location</th>
               <th>Capacity</th>
-              <th>Availability</th>
+              <th>Status</th>
               <th>Created At</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
 
           <tbody>
 
-            {filteredVenues.length > 0 ? (
-              filteredVenues.map((venue) => (
-                <tr key={venue.id}>
-
-                  <td>
-                    #{venue.id}
-                  </td>
-
-                  <td>
-                    <strong>
-                      {venue.name}
-                    </strong>
-                  </td>
-
-                  <td>
-                    {venue.location}
-                  </td>
-
-                  <td>
-                    {venue.capacity.toLocaleString()}
-                  </td>
-
-                  <td>
-                    <button
-                      type="button"
-                      className={`status ${
-                        venue.available
-                          ? "available"
-                          : "unavailable"
-                      }`}
-                      onClick={() =>
-                        toggleAvailability(
-                          venue.id
-                        )
-                      }
-                    >
-                      {venue.available
-                        ? "Available"
-                        : "Unavailable"}
-                    </button>
-                  </td>
-
-                  <td>
-                    {venue.createdAt}
-                  </td>
-
-                  <td>
-                    <div className="action-buttons">
-
-                      <button
-                        className="edit-btn"
-                        onClick={() =>
-                          handleEdit(venue)
-                        }
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        className="delete-btn"
-                        onClick={() =>
-                          handleDelete(venue.id)
-                        }
-                      >
-                        Delete
-                      </button>
-
-                    </div>
-                  </td>
-
-                </tr>
-              ))
-            ) : (
+            {filteredVenues.length === 0 ? (
               <tr>
                 <td
                   colSpan="7"
@@ -393,6 +332,74 @@ function Venues() {
                   No venues found.
                 </td>
               </tr>
+            ) : (
+              filteredVenues.map(
+                (venue, index) => (
+                  <tr key={venue.id}>
+
+                    <td>{index + 1}</td>
+
+                    <td>
+                      <strong>
+                        {venue.name}
+                      </strong>
+                    </td>
+
+                    <td>
+                      {venue.location}
+                    </td>
+
+                    <td>
+                      {venue.capacity.toLocaleString()}
+                    </td>
+
+                    <td>
+                      <span
+                        className={
+                          venue.available
+                            ? "status status-active"
+                            : "status status-inactive"
+                        }
+                      >
+                        {venue.available
+                          ? "Available"
+                          : "Unavailable"}
+                      </span>
+                    </td>
+
+                    <td>
+                      {venue.createdAt}
+                    </td>
+
+                    <td>
+                      <div className="action-buttons">
+
+                        <button
+                          className="edit-btn"
+                          onClick={() =>
+                            openEditModal(venue)
+                          }
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className="delete-btn"
+                          onClick={() =>
+                            handleDelete(
+                              venue.id
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+
+                      </div>
+                    </td>
+
+                  </tr>
+                )
+              )
             )}
 
           </tbody>
@@ -401,8 +408,8 @@ function Venues() {
 
       </div>
 
-      {/* Add / Edit Modal */}
-      {showModal && (
+      {/* ADD / EDIT VENUE MODAL */}
+      {isModalOpen && (
         <div className="modal-overlay">
 
           <div className="modal">
@@ -411,18 +418,19 @@ function Venues() {
 
               <div>
                 <h2>
-                  {isEditing
+                  {editingVenue
                     ? "Edit Venue"
-                    : "Add New Venue"}
+                    : "Add Venue"}
                 </h2>
 
                 <p>
-                  Enter venue information below
+                  {editingVenue
+                    ? "Update venue information."
+                    : "Add a new tournament venue."}
                 </p>
               </div>
 
               <button
-                type="button"
                 className="close-btn"
                 onClick={closeModal}
               >
@@ -433,12 +441,8 @@ function Venues() {
 
             <form onSubmit={handleSubmit}>
 
-              {/* Venue Name */}
               <div className="form-group">
-
-                <label>
-                  Venue Name
-                </label>
+                <label>Venue Name</label>
 
                 <input
                   type="text"
@@ -446,17 +450,11 @@ function Venues() {
                   placeholder="Enter venue name"
                   value={formData.name}
                   onChange={handleChange}
-                  required
                 />
-
               </div>
 
-              {/* Location */}
               <div className="form-group">
-
-                <label>
-                  Location
-                </label>
+                <label>Location</label>
 
                 <input
                   type="text"
@@ -464,17 +462,11 @@ function Venues() {
                   placeholder="Enter venue location"
                   value={formData.location}
                   onChange={handleChange}
-                  required
                 />
-
               </div>
 
-              {/* Capacity */}
               <div className="form-group">
-
-                <label>
-                  Capacity
-                </label>
+                <label>Capacity</label>
 
                 <input
                   type="number"
@@ -483,17 +475,11 @@ function Venues() {
                   min="1"
                   value={formData.capacity}
                   onChange={handleChange}
-                  required
                 />
-
               </div>
 
-              {/* Availability */}
               <div className="form-group">
-
-                <label>
-                  Availability
-                </label>
+                <label>Availability</label>
 
                 <select
                   name="available"
@@ -501,12 +487,14 @@ function Venues() {
                     formData.available
                   )}
                   onChange={(e) =>
-                    setFormData((previous) => ({
-                      ...previous,
-                      available:
-                        e.target.value ===
-                        "true",
-                    }))
+                    setFormData(
+                      (previous) => ({
+                        ...previous,
+                        available:
+                          e.target.value ===
+                          "true",
+                      })
+                    )
                   }
                 >
                   <option value="true">
@@ -517,10 +505,8 @@ function Venues() {
                     Unavailable
                   </option>
                 </select>
-
               </div>
 
-              {/* Modal Buttons */}
               <div className="modal-actions">
 
                 <button
@@ -535,7 +521,7 @@ function Venues() {
                   type="submit"
                   className="primary-btn"
                 >
-                  {isEditing
+                  {editingVenue
                     ? "Update Venue"
                     : "Add Venue"}
                 </button>

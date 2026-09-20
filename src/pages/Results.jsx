@@ -1,152 +1,148 @@
 import { useState } from "react";
 
-const matches = [
-  {
-    id: 1,
-    tournament: "University Football Championship 2026",
-    homeTeam: "CSE Warriors",
-    awayTeam: "EEE Titans",
-    date: "2026-10-05",
-  },
-  {
-    id: 2,
-    tournament: "University Football Championship 2026",
-    homeTeam: "EEE Titans",
-    awayTeam: "BBA Strikers",
-    date: "2026-10-07",
-  },
-  {
-    id: 3,
-    tournament: "Inter Department Cricket Cup 2026",
-    homeTeam: "CSE Warriors",
-    awayTeam: "BBA Strikers",
-    date: "2026-10-10",
-  },
-];
-
-const initialResults = [
-  {
-    id: 1,
-    matchId: 1,
-    team1Score: 3,
-    team2Score: 1,
-    winner: "CSE Warriors",
-    notes: "CSE Warriors won the semi final.",
-  },
-  {
-    id: 2,
-    matchId: 2,
-    team1Score: 2,
-    team2Score: 2,
-    winner: "Draw",
-    notes: "Both teams finished with equal scores.",
-  },
-];
-
-const emptyForm = {
-  matchId: "",
-  team1Score: "",
-  team2Score: "",
-  notes: "",
-};
-
 function Results() {
-  const [results, setResults] = useState(initialResults);
-  const [search, setSearch] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState(emptyForm);
+  const tournaments = [
+    {
+      id: 1,
+      name: "SIU Football Championship 2026",
+    },
+    {
+      id: 2,
+      name: "Inter Department Cricket Cup",
+    },
+    {
+      id: 3,
+      name: "University Basketball League",
+    },
+  ];
 
-  const isEditing = editingId !== null;
+  const teams = [
+    {
+      id: 1,
+      name: "CSE Warriors",
+    },
+    {
+      id: 2,
+      name: "EEE Titans",
+    },
+    {
+      id: 3,
+      name: "BBA Strikers",
+    },
+    {
+      id: 4,
+      name: "Civil United",
+    },
+  ];
 
-  // Find match
+  const [matches] = useState([
+    {
+      id: 1,
+      tournamentId: 1,
+      homeTeamId: 1,
+      awayTeamId: 2,
+      matchDate: "2026-09-20",
+    },
+    {
+      id: 2,
+      tournamentId: 1,
+      homeTeamId: 3,
+      awayTeamId: 4,
+      matchDate: "2026-09-22",
+    },
+    {
+      id: 3,
+      tournamentId: 2,
+      homeTeamId: 1,
+      awayTeamId: 3,
+      matchDate: "2026-09-25",
+    },
+  ]);
+
+  const [results, setResults] = useState([
+    {
+      id: 1,
+      matchId: 1,
+      team1Score: 2,
+      team2Score: 1,
+      winnerTeamId: 1,
+      notes: "CSE Warriors won the match.",
+    },
+    {
+      id: 2,
+      matchId: 2,
+      team1Score: 1,
+      team2Score: 1,
+      winnerTeamId: null,
+      notes: "Match ended in a draw.",
+    },
+  ]);
+
+  const [searchTerm, setSearchTerm] =
+    useState("");
+
+  const [tournamentFilter, setTournamentFilter] =
+    useState("all");
+
+  const [winnerFilter, setWinnerFilter] =
+    useState("all");
+
+  const [isModalOpen, setIsModalOpen] =
+    useState(false);
+
+  const [editingResult, setEditingResult] =
+    useState(null);
+
+  const [formData, setFormData] = useState({
+    matchId: "",
+    team1Score: "",
+    team2Score: "",
+    notes: "",
+  });
+
+  const getTeamName = (teamId) => {
+    const team = teams.find(
+      (item) => item.id === Number(teamId)
+    );
+
+    return team
+      ? team.name
+      : "Unknown Team";
+  };
+
+  const getTournamentName = (tournamentId) => {
+    const tournament = tournaments.find(
+      (item) =>
+        item.id === Number(tournamentId)
+    );
+
+    return tournament
+      ? tournament.name
+      : "Unknown Tournament";
+  };
+
   const getMatch = (matchId) => {
     return matches.find(
       (match) => match.id === Number(matchId)
     );
   };
 
-  // Get match name
-  const getMatchName = (matchId) => {
-    const match = getMatch(matchId);
-
-    if (!match) {
-      return "Unknown Match";
+  const getWinnerName = (result) => {
+    if (!result.winnerTeamId) {
+      return "Draw";
     }
 
-    return `${match.homeTeam} vs ${match.awayTeam}`;
+    return getTeamName(result.winnerTeamId);
   };
 
-  // Calculate winner
-  const getWinner = (matchId, score1, score2) => {
-    const match = getMatch(matchId);
-
-    if (!match) {
-      return "Unknown";
+  const getWinnerClass = (result) => {
+    if (!result.winnerTeamId) {
+      return "draw";
     }
 
-    const team1Score = Number(score1);
-    const team2Score = Number(score2);
-
-    if (team1Score > team2Score) {
-      return match.homeTeam;
-    }
-
-    if (team2Score > team1Score) {
-      return match.awayTeam;
-    }
-
-    return "Draw";
+    return "winner";
   };
 
-  // Search
-  const filteredResults = results.filter((result) => {
-    const match = getMatch(result.matchId);
-
-    if (!match) {
-      return false;
-    }
-
-    const searchText = search.toLowerCase();
-
-    return (
-      match.homeTeam
-        .toLowerCase()
-        .includes(searchText) ||
-      match.awayTeam
-        .toLowerCase()
-        .includes(searchText) ||
-      match.tournament
-        .toLowerCase()
-        .includes(searchText) ||
-      result.winner
-        .toLowerCase()
-        .includes(searchText)
-    );
-  });
-
-  // Open Add modal
-  const handleAdd = () => {
-    setEditingId(null);
-    setFormData(emptyForm);
-    setShowModal(true);
-  };
-
-  // Open Edit modal
-  const handleEdit = (result) => {
-    setEditingId(result.id);
-
-    setFormData({
-      matchId: String(result.matchId),
-      team1Score: String(result.team1Score),
-      team2Score: String(result.team2Score),
-      notes: result.notes,
-    });
-
-    setShowModal(true);
-  };
-
-  // Input change
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -156,7 +152,56 @@ function Results() {
     }));
   };
 
-  // Submit result
+  const calculateWinner = (
+    team1Score,
+    team2Score,
+    match
+  ) => {
+    const score1 = Number(team1Score);
+    const score2 = Number(team2Score);
+
+    if (score1 > score2) {
+      return match.homeTeamId;
+    }
+
+    if (score2 > score1) {
+      return match.awayTeamId;
+    }
+
+    return null;
+  };
+
+  const openAddModal = () => {
+    setEditingResult(null);
+
+    setFormData({
+      matchId: "",
+      team1Score: "",
+      team2Score: "",
+      notes: "",
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (result) => {
+    setEditingResult(result);
+
+    setFormData({
+      matchId: result.matchId,
+      team1Score: result.team1Score,
+      team2Score: result.team2Score,
+      notes: result.notes,
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingResult(null);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -169,63 +214,77 @@ function Results() {
       return;
     }
 
+    const match = getMatch(formData.matchId);
+
+    if (!match) {
+      alert("Selected match not found.");
+      return;
+    }
+
+    const team1Score = Number(
+      formData.team1Score
+    );
+
+    const team2Score = Number(
+      formData.team2Score
+    );
+
     if (
-      Number(formData.team1Score) < 0 ||
-      Number(formData.team2Score) < 0
+      team1Score < 0 ||
+      team2Score < 0
     ) {
       alert("Score cannot be negative.");
       return;
     }
 
-    // Prevent duplicate result for another match
-    const duplicateResult = results.find(
-      (result) =>
-        result.matchId === Number(formData.matchId) &&
-        result.id !== editingId
+    const winnerTeamId = calculateWinner(
+      team1Score,
+      team2Score,
+      match
     );
 
-    if (duplicateResult) {
-      alert(
-        "This match already has a result. Please edit the existing result."
-      );
-      return;
-    }
-
-    const match = getMatch(formData.matchId);
-
-    const winner = getWinner(
-      formData.matchId,
-      formData.team1Score,
-      formData.team2Score
-    );
-
-    const resultData = {
-      matchId: Number(formData.matchId),
-      team1Score: Number(formData.team1Score),
-      team2Score: Number(formData.team2Score),
-      winner,
-      notes:
-        formData.notes.trim() ||
-        `${winner} result recorded.`,
-    };
-
-    if (isEditing) {
+    if (editingResult) {
       setResults((previous) =>
         previous.map((result) =>
-          result.id === editingId
+          result.id === editingResult.id
             ? {
                 ...result,
-                ...resultData,
+                matchId: Number(
+                  formData.matchId
+                ),
+                team1Score,
+                team2Score,
+                winnerTeamId,
+                notes: formData.notes,
               }
             : result
         )
       );
 
-      alert("Result updated successfully.");
+      alert("Result updated successfully!");
     } else {
+      const alreadyExists = results.some(
+        (result) =>
+          result.matchId ===
+          Number(formData.matchId)
+      );
+
+      if (alreadyExists) {
+        alert(
+          "This match already has a result."
+        );
+        return;
+      }
+
       const newResult = {
         id: Date.now(),
-        ...resultData,
+        matchId: Number(
+          formData.matchId
+        ),
+        team1Score,
+        team2Score,
+        winnerTeamId,
+        notes: formData.notes,
       };
 
       setResults((previous) => [
@@ -233,264 +292,250 @@ function Results() {
         newResult,
       ]);
 
-      alert(
-        `${match.homeTeam} vs ${match.awayTeam} result added successfully.`
-      );
+      alert("Result added successfully!");
     }
 
     closeModal();
   };
 
-  // Delete
   const handleDelete = (id) => {
-    const result = results.find(
-      (item) => item.id === id
-    );
-
     const confirmed = window.confirm(
-      `Are you sure you want to delete the result of ${getMatchName(
-        result?.matchId
-      )}?`
+      "Are you sure you want to delete this result?"
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     setResults((previous) =>
-      previous.filter((result) => result.id !== id)
+      previous.filter(
+        (result) => result.id !== id
+      )
     );
   };
 
-  // Close modal
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingId(null);
-    setFormData(emptyForm);
-  };
+  const filteredResults = results.filter(
+    (result) => {
+      const match = getMatch(
+        result.matchId
+      );
 
-  // Statistics
+      if (!match) {
+        return false;
+      }
+
+      const homeTeam = getTeamName(
+        match.homeTeamId
+      ).toLowerCase();
+
+      const awayTeam = getTeamName(
+        match.awayTeamId
+      ).toLowerCase();
+
+      const search = searchTerm
+        .toLowerCase()
+        .trim();
+
+      const matchesSearch =
+        homeTeam.includes(search) ||
+        awayTeam.includes(search);
+
+      const matchesTournament =
+        tournamentFilter === "all" ||
+        match.tournamentId ===
+          Number(tournamentFilter);
+
+      const matchesWinner =
+        winnerFilter === "all" ||
+        (winnerFilter === "draw" &&
+          result.winnerTeamId === null) ||
+        Number(winnerFilter) ===
+          result.winnerTeamId;
+
+      return (
+        matchesSearch &&
+        matchesTournament &&
+        matchesWinner
+      );
+    }
+  );
+
   const totalResults = results.length;
 
-  const totalWins = results.filter(
-    (result) => result.winner !== "Draw"
-  ).length;
+  const completedMatches =
+    results.length;
 
-  const totalDraws = results.filter(
-    (result) => result.winner === "Draw"
+  const drawMatches = results.filter(
+    (result) =>
+      result.winnerTeamId === null
   ).length;
-
-  const pendingResults =
-    matches.length - results.length;
 
   return (
     <div className="page">
 
-      {/* HEADER */}
+      {/* PAGE HEADER */}
       <div className="page-header">
+
         <div>
-          <h1>Result Management</h1>
+          <h1>Match Result Management</h1>
+
           <p>
-            Record and manage tournament match results
+            Manage match scores and tournament
+            results.
           </p>
         </div>
 
+        {/* ONLY ONE ADD RESULT BUTTON */}
         <button
-          type="button"
           className="primary-btn"
-          onClick={handleAdd}
+          onClick={openAddModal}
         >
           + Add Result
         </button>
+
       </div>
 
-      {/* STATS */}
-      <div className="stats">
+      {/* SUMMARY CARDS */}
+      <div className="summary-grid">
 
-        <div className="card">
-          <div className="card-top">
-            <span>Total Results</span>
-            <div className="card-icon">📋</div>
+        <div className="summary-card">
+
+          <div className="summary-icon">
+            🏆
           </div>
 
-          <h3>{totalResults}</h3>
+          <div>
+            <h3>{totalResults}</h3>
+            <p>Total Results</p>
+          </div>
 
-          <small>
-            Recorded match results
-          </small>
         </div>
 
-        <div className="card">
-          <div className="card-top">
-            <span>Completed Matches</span>
-            <div className="card-icon">✅</div>
+        <div className="summary-card">
+
+          <div className="summary-icon">
+            ✅
           </div>
 
-          <h3>{totalResults}</h3>
+          <div>
+            <h3>{completedMatches}</h3>
+            <p>Completed Matches</p>
+          </div>
 
-          <small>
-            Matches with results
-          </small>
         </div>
 
-        <div className="card">
-          <div className="card-top">
-            <span>Draws</span>
-            <div className="card-icon">🤝</div>
+        <div className="summary-card">
+
+          <div className="summary-icon">
+            🤝
           </div>
 
-          <h3>{totalDraws}</h3>
-
-          <small>
-            Draw results
-          </small>
-        </div>
-
-        <div className="card">
-          <div className="card-top">
-            <span>Pending</span>
-            <div className="card-icon">⏳</div>
+          <div>
+            <h3>{drawMatches}</h3>
+            <p>Draw Matches</p>
           </div>
 
-          <h3>
-            {pendingResults > 0
-              ? pendingResults
-              : 0}
-          </h3>
-
-          <small>
-            Matches without result
-          </small>
         </div>
 
       </div>
 
-      {/* TOOLBAR */}
+      {/* SEARCH + FILTER */}
       <div className="toolbar">
 
         <input
-          type="search"
+          type="text"
           className="search-input"
-          placeholder="Search team, tournament or winner..."
-          value={search}
+          placeholder="Search team..."
+          value={searchTerm}
           onChange={(e) =>
-            setSearch(e.target.value)
+            setSearchTerm(e.target.value)
           }
         />
 
-        <button
-          type="button"
-          className="primary-btn"
-          onClick={handleAdd}
+        <select
+          value={tournamentFilter}
+          onChange={(e) =>
+            setTournamentFilter(
+              e.target.value
+            )
+          }
+          style={{
+            padding: "12px 15px",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            fontSize: "15px",
+            background: "white",
+            outline: "none",
+          }}
         >
-          + Add Result
-        </button>
+          <option value="all">
+            All Tournaments
+          </option>
+
+          {tournaments.map(
+            (tournament) => (
+              <option
+                key={tournament.id}
+                value={tournament.id}
+              >
+                {tournament.name}
+              </option>
+            )
+          )}
+        </select>
+
+        <select
+          value={winnerFilter}
+          onChange={(e) =>
+            setWinnerFilter(e.target.value)
+          }
+          style={{
+            padding: "12px 15px",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            fontSize: "15px",
+            background: "white",
+            outline: "none",
+          }}
+        >
+          <option value="all">
+            All Results
+          </option>
+
+          <option value="draw">
+            Draw
+          </option>
+
+          {teams.map((team) => (
+            <option
+              key={team.id}
+              value={team.id}
+            >
+              Won by {team.name}
+            </option>
+          ))}
+        </select>
 
       </div>
 
-      {/* TABLE */}
+      {/* RESULT TABLE */}
       <div className="table-container">
 
         <table>
 
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Match</th>
+              <th>#</th>
               <th>Tournament</th>
+              <th>Match</th>
               <th>Score</th>
               <th>Winner</th>
               <th>Notes</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
 
           <tbody>
 
-            {filteredResults.length > 0 ? (
-              filteredResults.map((result) => {
-                const match = getMatch(
-                  result.matchId
-                );
-
-                return (
-                  <tr key={result.id}>
-
-                    <td>#{result.id}</td>
-
-                    <td>
-                      <strong>
-                        {match
-                          ? `${match.homeTeam} vs ${match.awayTeam}`
-                          : "Unknown Match"}
-                      </strong>
-                    </td>
-
-                    <td>
-                      {match?.tournament ||
-                        "Unknown Tournament"}
-                    </td>
-
-                    <td>
-                      <span className="result-score">
-                        {result.team1Score}
-                      </span>
-
-                      <strong className="score-separator">
-                        -
-                      </strong>
-
-                      <span className="result-score">
-                        {result.team2Score}
-                      </span>
-                    </td>
-
-                    <td>
-                      <span
-                        className={
-                          result.winner === "Draw"
-                            ? "result-winner draw"
-                            : "result-winner"
-                        }
-                      >
-                        {result.winner}
-                      </span>
-                    </td>
-
-                    <td>
-                      {result.notes || "-"}
-                    </td>
-
-                    <td>
-                      <div className="action-buttons">
-
-                        <button
-                          type="button"
-                          className="edit-btn"
-                          onClick={() =>
-                            handleEdit(result)
-                          }
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          type="button"
-                          className="delete-btn"
-                          onClick={() =>
-                            handleDelete(result.id)
-                          }
-                        >
-                          Delete
-                        </button>
-
-                      </div>
-                    </td>
-
-                  </tr>
-                );
-              })
-            ) : (
+            {filteredResults.length === 0 ? (
               <tr>
                 <td
                   colSpan="7"
@@ -499,6 +544,102 @@ function Results() {
                   No results found.
                 </td>
               </tr>
+            ) : (
+              filteredResults.map(
+                (result, index) => {
+                  const match = getMatch(
+                    result.matchId
+                  );
+
+                  return (
+                    <tr key={result.id}>
+
+                      <td>
+                        {index + 1}
+                      </td>
+
+                      <td>
+                        {getTournamentName(
+                          match.tournamentId
+                        )}
+                      </td>
+
+                      <td>
+                        <strong>
+                          {getTeamName(
+                            match.homeTeamId
+                          )}
+                        </strong>
+
+                        <span> vs </span>
+
+                        <strong>
+                          {getTeamName(
+                            match.awayTeamId
+                          )}
+                        </strong>
+                      </td>
+
+                      <td>
+                        <strong>
+                          {result.team1Score}
+                        </strong>
+
+                        <span> - </span>
+
+                        <strong>
+                          {result.team2Score}
+                        </strong>
+                      </td>
+
+                      <td>
+                        <span
+                          className={`result-winner ${getWinnerClass(
+                            result
+                          )}`}
+                        >
+                          {getWinnerName(
+                            result
+                          )}
+                        </span>
+                      </td>
+
+                      <td>
+                        {result.notes || "—"}
+                      </td>
+
+                      <td>
+                        <div className="action-buttons">
+
+                          <button
+                            className="edit-btn"
+                            onClick={() =>
+                              openEditModal(
+                                result
+                              )
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            className="delete-btn"
+                            onClick={() =>
+                              handleDelete(
+                                result.id
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+                      </td>
+
+                    </tr>
+                  );
+                }
+              )
             )}
 
           </tbody>
@@ -507,29 +648,31 @@ function Results() {
 
       </div>
 
-      {/* MODAL */}
-      {showModal && (
+      {/* ADD / EDIT RESULT MODAL */}
+      {isModalOpen && (
         <div className="modal-overlay">
 
           <div className="modal result-modal">
 
-            {/* MODAL HEADER */}
             <div className="modal-header">
 
               <div>
+
                 <h2>
-                  {isEditing
-                    ? "Edit Match Result"
-                    : "Add Match Result"}
+                  {editingResult
+                    ? "Edit Result"
+                    : "Add Result"}
                 </h2>
 
                 <p>
-                  Enter the final match score
+                  {editingResult
+                    ? "Update match result."
+                    : "Enter the final match result."}
                 </p>
+
               </div>
 
               <button
-                type="button"
                 className="close-btn"
                 onClick={closeModal}
               >
@@ -538,155 +681,167 @@ function Results() {
 
             </div>
 
-            {/* FORM */}
             <form
               className="result-form"
               onSubmit={handleSubmit}
             >
 
-              {/* MATCH */}
               <div className="form-group">
-                <label>Match</label>
+
+                <label>
+                  Match
+                </label>
 
                 <select
                   name="matchId"
                   value={formData.matchId}
                   onChange={handleChange}
-                  required
+                  disabled={Boolean(
+                    editingResult
+                  )}
                 >
+
                   <option value="">
                     Select Match
                   </option>
 
-                  {matches.map((match) => {
-                    const alreadyHasResult =
-                      results.some(
-                        (result) =>
-                          result.matchId ===
-                            match.id &&
-                          result.id !== editingId
-                      );
+                  {matches.map((match) => (
+                    <option
+                      key={match.id}
+                      value={match.id}
+                    >
+                      {getTeamName(
+                        match.homeTeamId
+                      )}{" "}
+                      vs{" "}
+                      {getTeamName(
+                        match.awayTeamId
+                      )}{" "}
+                      -{" "}
+                      {match.matchDate}
+                    </option>
+                  ))}
 
-                    return (
-                      <option
-                        key={match.id}
-                        value={match.id}
-                        disabled={alreadyHasResult}
-                      >
-                        {match.homeTeam} vs{" "}
-                        {match.awayTeam}
-                        {alreadyHasResult
-                          ? " (Result Added)"
-                          : ""}
-                      </option>
-                    );
-                  })}
                 </select>
+
               </div>
 
-              {/* SELECTED MATCH */}
               {formData.matchId && (
                 <div className="selected-match-box">
 
-                  <span>
-                    {getMatch(
-                      formData.matchId
-                    )?.homeTeam}
-                  </span>
+                  <strong>
+                    {(() => {
+                      const match =
+                        getMatch(
+                          formData.matchId
+                        );
 
-                  <strong>VS</strong>
-
-                  <span>
-                    {getMatch(
-                      formData.matchId
-                    )?.awayTeam}
-                  </span>
+                      return match
+                        ? `${getTeamName(
+                            match.homeTeamId
+                          )} vs ${getTeamName(
+                            match.awayTeamId
+                          )}`
+                        : "";
+                    })()}
+                  </strong>
 
                 </div>
               )}
 
-              {/* TEAM 1 SCORE */}
-              <div className="form-group">
-                <label>
-                  {formData.matchId
-                    ? `${
-                        getMatch(
-                          formData.matchId
-                        )?.homeTeam
-                      } Score`
-                    : "Team 1 Score"}
-                </label>
+              <div className="score-input-grid">
 
-                <input
-                  type="number"
-                  name="team1Score"
-                  min="0"
-                  placeholder="Enter score"
-                  value={formData.team1Score}
-                  onChange={handleChange}
-                  required
-                />
+                <div className="form-group">
+
+                  <label>
+                    Team 1 Score
+                  </label>
+
+                  <input
+                    type="number"
+                    name="team1Score"
+                    min="0"
+                    placeholder="0"
+                    value={
+                      formData.team1Score
+                    }
+                    onChange={handleChange}
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Team 2 Score
+                  </label>
+
+                  <input
+                    type="number"
+                    name="team2Score"
+                    min="0"
+                    placeholder="0"
+                    value={
+                      formData.team2Score
+                    }
+                    onChange={handleChange}
+                  />
+
+                </div>
+
               </div>
 
-              {/* TEAM 2 SCORE */}
-              <div className="form-group">
-                <label>
-                  {formData.matchId
-                    ? `${
-                        getMatch(
-                          formData.matchId
-                        )?.awayTeam
-                      } Score`
-                    : "Team 2 Score"}
-                </label>
-
-                <input
-                  type="number"
-                  name="team2Score"
-                  min="0"
-                  placeholder="Enter score"
-                  value={formData.team2Score}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              {/* WINNER PREVIEW */}
               {formData.matchId &&
                 formData.team1Score !== "" &&
                 formData.team2Score !== "" && (
                   <div className="winner-preview">
 
-                    <span>
-                      Winner
-                    </span>
-
                     <strong>
-                      {getWinner(
-                        formData.matchId,
-                        formData.team1Score,
-                        formData.team2Score
-                      )}
-                    </strong>
+                      Winner:
+                    </strong>{" "}
+
+                    {(() => {
+                      const match =
+                        getMatch(
+                          formData.matchId
+                        );
+
+                      if (!match) {
+                        return "";
+                      }
+
+                      const winner =
+                        calculateWinner(
+                          formData.team1Score,
+                          formData.team2Score,
+                          match
+                        );
+
+                      return winner
+                        ? getTeamName(winner)
+                        : "Draw";
+                    })()}
 
                   </div>
                 )}
 
-              {/* NOTES */}
               <div className="form-group">
-                <label>Notes</label>
+
+                <label>
+                  Notes
+                </label>
 
                 <textarea
                   name="notes"
-                  rows="4"
                   placeholder="Enter result notes..."
                   value={formData.notes}
                   onChange={handleChange}
+                  rows="3"
                 />
+
               </div>
 
-              {/* BUTTONS */}
-              <div className="result-form-actions">
+              <div className="modal-actions">
 
                 <button
                   type="button"
@@ -700,7 +855,7 @@ function Results() {
                   type="submit"
                   className="primary-btn"
                 >
-                  {isEditing
+                  {editingResult
                     ? "Update Result"
                     : "Save Result"}
                 </button>

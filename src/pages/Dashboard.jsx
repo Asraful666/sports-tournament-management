@@ -1,17 +1,76 @@
+import { Link } from "react-router-dom";
+
+const statistics = [
+  {
+    title: "Total Tournaments",
+    value: 12,
+    icon: "🏆",
+    description: "Active and completed tournaments",
+  },
+  {
+    title: "Total Teams",
+    value: 48,
+    icon: "👥",
+    description: "Registered tournament teams",
+  },
+  {
+    title: "Total Players",
+    value: 384,
+    icon: "⚽",
+    description: "Registered players",
+  },
+  {
+    title: "Total Matches",
+    value: 96,
+    icon: "📅",
+    description: "Scheduled tournament matches",
+  },
+];
+
+const quickActions = [
+  {
+    title: "Create Tournament",
+    description: "Add a new tournament",
+    icon: "🏆",
+    path: "/tournaments",
+  },
+  {
+    title: "Register Team",
+    description: "Add a new team",
+    icon: "👥",
+    path: "/teams",
+  },
+  {
+    title: "Add Player",
+    description: "Register player information",
+    icon: "⚽",
+    path: "/players",
+  },
+  {
+    title: "Create Fixture",
+    description: "Schedule a match",
+    icon: "📅",
+    path: "/matches",
+  },
+];
+
 const recentResults = [
   {
+    id: 1,
     home: "Eagles FC",
     away: "Tiger United",
     score: "2 - 1",
     date: "18 Sep 2026",
   },
   {
+    id: 2,
     home: "Blue Warriors",
     away: "Red Lions",
     score: "1 - 1",
     date: "17 Sep 2026",
   },
   {
+    id: 3,
     home: "Green Stars",
     away: "Falcon FC",
     score: "3 - 0",
@@ -21,18 +80,21 @@ const recentResults = [
 
 const upcomingMatches = [
   {
+    id: 1,
     home: "Eagles FC",
     away: "Blue Warriors",
     date: "20 Sep 2026",
     time: "4:00 PM",
   },
   {
+    id: 2,
     home: "Tiger United",
     away: "Red Lions",
     date: "21 Sep 2026",
     time: "5:00 PM",
   },
   {
+    id: 3,
     home: "Falcon FC",
     away: "Green Stars",
     date: "22 Sep 2026",
@@ -74,7 +136,6 @@ const standings = [
 function Dashboard() {
   return (
     <div>
-
       {/* Page Heading */}
 
       <div className="page-title">
@@ -86,73 +147,30 @@ function Dashboard() {
           </p>
         </div>
 
-        <button className="primary-btn">
+        <Link to="/tournaments" className="primary-btn">
           + Create Tournament
-        </button>
+        </Link>
       </div>
-
 
       {/* Statistics */}
 
       <div className="stats">
+        {statistics.map((stat) => (
+          <div className="card" key={stat.title}>
+            <div className="card-top">
+              <span>{stat.title}</span>
 
-        <div className="card">
-          <div className="card-top">
-            <span>Total Tournaments</span>
-            <div className="card-icon">🏆</div>
+              <div className="card-icon">
+                {stat.icon}
+              </div>
+            </div>
+
+            <h3>{stat.value}</h3>
+
+            <small>{stat.description}</small>
           </div>
-
-          <h3>12</h3>
-
-          <small>
-            Active and completed tournaments
-          </small>
-        </div>
-
-
-        <div className="card">
-          <div className="card-top">
-            <span>Total Teams</span>
-            <div className="card-icon">👥</div>
-          </div>
-
-          <h3>48</h3>
-
-          <small>
-            Registered tournament teams
-          </small>
-        </div>
-
-
-        <div className="card">
-          <div className="card-top">
-            <span>Total Players</span>
-            <div className="card-icon">⚽</div>
-          </div>
-
-          <h3>384</h3>
-
-          <small>
-            Registered players
-          </small>
-        </div>
-
-
-        <div className="card">
-          <div className="card-top">
-            <span>Total Matches</span>
-            <div className="card-icon">📅</div>
-          </div>
-
-          <h3>96</h3>
-
-          <small>
-            Scheduled tournament matches
-          </small>
-        </div>
-
+        ))}
       </div>
-
 
       {/* Quick Actions */}
 
@@ -166,149 +184,110 @@ function Dashboard() {
         </div>
       </div>
 
-
       <div className="quick-actions">
+        {quickActions.map((action) => (
+          <Link
+            to={action.path}
+            className="quick-action"
+            key={action.title}
+          >
+            <span>{action.icon}</span>
 
-        <button className="quick-action">
-          <span>🏆</span>
-          <div>
-            <strong>Create Tournament</strong>
-            <small>Add a new tournament</small>
-          </div>
-        </button>
+            <div>
+              <strong>{action.title}</strong>
 
-
-        <button className="quick-action">
-          <span>👥</span>
-          <div>
-            <strong>Register Team</strong>
-            <small>Add a new team</small>
-          </div>
-        </button>
-
-
-        <button className="quick-action">
-          <span>⚽</span>
-          <div>
-            <strong>Add Player</strong>
-            <small>Register player information</small>
-          </div>
-        </button>
-
-
-        <button className="quick-action">
-          <span>📅</span>
-          <div>
-            <strong>Create Fixture</strong>
-            <small>Schedule a match</small>
-          </div>
-        </button>
-
+              <small>{action.description}</small>
+            </div>
+          </Link>
+        ))}
       </div>
-
 
       {/* Recent Results + Upcoming Matches */}
 
       <div className="dashboard-grid">
-
         {/* Recent Results */}
 
         <div className="dashboard-box">
-
           <div className="box-header">
-
             <div>
               <h3>Recent Results</h3>
+
               <p>Latest completed matches</p>
             </div>
 
-            <button className="view-btn">
+            <Link to="/results" className="view-btn">
               View All
-            </button>
-
+            </Link>
           </div>
 
-
           <div className="match-list">
-
-            {recentResults.map((match, index) => (
+            {recentResults.map((match) => (
               <div
                 className="match-item"
-                key={index}
+                key={match.id}
               >
-
                 <div className="team-names">
                   <strong>{match.home}</strong>
+
                   <span>vs</span>
+
                   <strong>{match.away}</strong>
                 </div>
 
                 <div className="match-score">
                   <strong>{match.score}</strong>
+
                   <small>{match.date}</small>
                 </div>
-
               </div>
             ))}
-
           </div>
-
         </div>
-
 
         {/* Upcoming Matches */}
 
         <div className="dashboard-box">
-
           <div className="box-header">
-
             <div>
               <h3>Upcoming Matches</h3>
+
               <p>Next scheduled fixtures</p>
             </div>
 
-            <button className="view-btn">
+            <Link to="/matches" className="view-btn">
               View All
-            </button>
-
+            </Link>
           </div>
 
-
           <div className="match-list">
-
-            {upcomingMatches.map((match, index) => (
+            {upcomingMatches.map((match) => (
               <div
                 className="match-item"
-                key={index}
+                key={match.id}
               >
-
                 <div className="team-names">
                   <strong>{match.home}</strong>
+
                   <span>vs</span>
+
                   <strong>{match.away}</strong>
                 </div>
 
                 <div className="match-score">
                   <strong>{match.time}</strong>
+
                   <small>{match.date}</small>
                 </div>
-
               </div>
             ))}
-
           </div>
-
         </div>
-
       </div>
 
-
-      {/* Standings */}
+      {/* Tournament Standings */}
 
       <div className="dashboard-box standings-box">
-
         <div className="box-header">
-
           <div>
             <h3>Tournament Standings</h3>
 
@@ -317,19 +296,14 @@ function Dashboard() {
             </p>
           </div>
 
-          <button className="view-btn">
+          <Link to="/standings" className="view-btn">
             View Full Table
-          </button>
-
+          </Link>
         </div>
 
-
         <div className="table-container">
-
           <table>
-
             <thead>
-
               <tr>
                 <th>#</th>
                 <th>Team</th>
@@ -337,15 +311,11 @@ function Dashboard() {
                 <th>Won</th>
                 <th>Points</th>
               </tr>
-
             </thead>
 
-
             <tbody>
-
               {standings.map((team) => (
-                <tr key={team.position}>
-
+                <tr key={team.team}>
                   <td>
                     <strong>{team.position}</strong>
                   </td>
@@ -361,18 +331,12 @@ function Dashboard() {
                   <td>
                     <strong>{team.points}</strong>
                   </td>
-
                 </tr>
               ))}
-
             </tbody>
-
           </table>
-
         </div>
-
       </div>
-
     </div>
   );
 }

@@ -1,194 +1,395 @@
 import { useState } from "react";
 
 function Teams() {
+  const tournaments = [
+    {
+      id: 1,
+      name: "SIU Football Championship 2026",
+    },
+    {
+      id: 2,
+      name: "Inter Department Cricket Cup",
+    },
+    {
+      id: 3,
+      name: "University Basketball League",
+    },
+  ];
+
   const [teams, setTeams] = useState([
     {
       id: 1,
       teamName: "CSE Warriors",
       coachName: "Rahim Ahmed",
       contactInfo: "01711111111",
-      createdAt: "2026-09-01",
+      tournamentId: 1,
+      createdAt: "2026-08-10",
     },
     {
       id: 2,
       teamName: "EEE Titans",
       coachName: "Karim Hasan",
       contactInfo: "01822222222",
-      createdAt: "2026-09-03",
+      tournamentId: 1,
+      createdAt: "2026-08-12",
     },
     {
       id: 3,
       teamName: "BBA Strikers",
-      coachName: "Sakib Khan",
+      coachName: "Sakib Rahman",
       contactInfo: "01933333333",
-      createdAt: "2026-09-05",
+      tournamentId: 2,
+      createdAt: "2026-08-15",
     },
   ]);
 
-  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [tournamentFilter, setTournamentFilter] =
+    useState("All");
+
   const [showModal, setShowModal] = useState(false);
+  const [editingTeam, setEditingTeam] = useState(null);
 
   const [formData, setFormData] = useState({
     teamName: "",
     coachName: "",
     contactInfo: "",
+    tournamentId: "",
   });
 
-  // Search
-  const filteredTeams = teams.filter((team) =>
-    team.teamName.toLowerCase().includes(search.toLowerCase())
-  );
+  const getTournamentName = (tournamentId) => {
+    const tournament = tournaments.find(
+      (item) => item.id === Number(tournamentId)
+    );
 
-  // Form input change
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    return tournament
+      ? tournament.name
+      : "Not Assigned";
   };
 
-  // Add Team
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-    const newTeam = {
-      id: Date.now(),
-      teamName: formData.teamName,
-      coachName: formData.coachName,
-      contactInfo: formData.contactInfo,
-      createdAt: new Date().toISOString().split("T")[0],
-    };
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
 
-    setTeams([...teams, newTeam]);
+  const handleRegister = () => {
+    setEditingTeam(null);
 
     setFormData({
       teamName: "",
       coachName: "",
       contactInfo: "",
+      tournamentId: "",
     });
 
-    setShowModal(false);
+    setShowModal(true);
   };
 
-  // Delete Team
+  const handleEdit = (team) => {
+    setEditingTeam(team);
+
+    setFormData({
+      teamName: team.teamName,
+      coachName: team.coachName,
+      contactInfo: team.contactInfo,
+      tournamentId: String(team.tournamentId),
+    });
+
+    setShowModal(true);
+  };
+
+  const handleClose = () => {
+    setShowModal(false);
+    setEditingTeam(null);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (
+      !formData.teamName ||
+      !formData.coachName ||
+      !formData.contactInfo ||
+      !formData.tournamentId
+    ) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    if (editingTeam) {
+      setTeams((previous) =>
+        previous.map((team) =>
+          team.id === editingTeam.id
+            ? {
+                ...team,
+                teamName: formData.teamName,
+                coachName: formData.coachName,
+                contactInfo: formData.contactInfo,
+                tournamentId: Number(
+                  formData.tournamentId
+                ),
+              }
+            : team
+        )
+      );
+
+      alert("Team updated successfully!");
+    } else {
+      const newTeam = {
+        id: Date.now(),
+        teamName: formData.teamName,
+        coachName: formData.coachName,
+        contactInfo: formData.contactInfo,
+        tournamentId: Number(
+          formData.tournamentId
+        ),
+        createdAt: new Date()
+          .toISOString()
+          .split("T")[0],
+      };
+
+      setTeams((previous) => [
+        ...previous,
+        newTeam,
+      ]);
+
+      alert("Team registered successfully!");
+    }
+
+    handleClose();
+  };
+
   const handleDelete = (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this team?"
     );
 
-    if (confirmDelete) {
-      setTeams(teams.filter((team) => team.id !== id));
-    }
+    if (!confirmDelete) return;
+
+    setTeams((previous) =>
+      previous.filter((team) => team.id !== id)
+    );
+
+    alert("Team deleted successfully!");
   };
+
+  const filteredTeams = teams.filter((team) => {
+    const search = searchTerm.toLowerCase();
+
+    const matchesSearch =
+      team.teamName
+        .toLowerCase()
+        .includes(search) ||
+      team.coachName
+        .toLowerCase()
+        .includes(search) ||
+      team.contactInfo
+        .toLowerCase()
+        .includes(search);
+
+    const matchesTournament =
+      tournamentFilter === "All" ||
+      team.tournamentId ===
+        Number(tournamentFilter);
+
+    return (
+      matchesSearch &&
+      matchesTournament
+    );
+  });
 
   return (
     <div className="page">
 
-      {/* Header */}
+      {/* PAGE HEADER */}
+
       <div className="page-header">
+
         <div>
           <h1>Team Management</h1>
-          <p>Register and manage tournament teams</p>
+
+          <p>
+            Register and manage participating teams.
+          </p>
         </div>
 
         <button
           className="primary-btn"
-          onClick={() => setShowModal(true)}
+          onClick={handleRegister}
         >
           + Register Team
         </button>
+
       </div>
 
-      {/* Summary */}
+      {/* SUMMARY */}
+
       <div className="summary-grid">
 
         <div className="summary-card">
-          <div className="summary-icon">⚽</div>
+
+          <div className="summary-icon">
+            👥
+          </div>
+
           <div>
             <h3>{teams.length}</h3>
             <p>Total Teams</p>
           </div>
+
         </div>
 
         <div className="summary-card">
-          <div className="summary-icon">👨‍🏫</div>
-          <div>
-            <h3>{teams.length}</h3>
-            <p>Team Coaches</p>
+
+          <div className="summary-icon">
+            🏆
           </div>
+
+          <div>
+            <h3>{tournaments.length}</h3>
+            <p>Tournaments</p>
+          </div>
+
         </div>
 
         <div className="summary-card">
-          <div className="summary-icon">🏆</div>
-          <div>
-            <h3>3</h3>
-            <p>Registered Teams</p>
+
+          <div className="summary-icon">
+            📋
           </div>
+
+          <div>
+            <h3>{filteredTeams.length}</h3>
+            <p>Showing Teams</p>
+          </div>
+
         </div>
 
       </div>
 
-      {/* Search */}
+      {/* SEARCH + FILTER */}
+
       <div className="toolbar">
 
         <input
-          type="text"
-          placeholder="Search team..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
           className="search-input"
+          type="text"
+          placeholder="Search team or coach..."
+          value={searchTerm}
+          onChange={(e) =>
+            setSearchTerm(e.target.value)
+          }
         />
 
-        <button
-          className="primary-btn"
-          onClick={() => setShowModal(true)}
+        <select
+          value={tournamentFilter}
+          onChange={(e) =>
+            setTournamentFilter(e.target.value)
+          }
+          style={{
+            padding: "12px 15px",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            outline: "none",
+            background: "white",
+            fontSize: "14px",
+          }}
         >
-          + Add Team
-        </button>
+          <option value="All">
+            All Tournaments
+          </option>
+
+          {tournaments.map((tournament) => (
+            <option
+              key={tournament.id}
+              value={tournament.id}
+            >
+              {tournament.name}
+            </option>
+          ))}
+        </select>
 
       </div>
 
-      {/* Team Table */}
+      {/* TEAM TABLE */}
+
       <div className="table-container">
 
         <table>
 
           <thead>
+
             <tr>
-              <th>ID</th>
+              <th>#</th>
               <th>Team Name</th>
-              <th>Coach Name</th>
-              <th>Contact Information</th>
+              <th>Coach</th>
+              <th>Contact</th>
+              <th>Tournament</th>
               <th>Created At</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
+
           </thead>
 
           <tbody>
 
-            {filteredTeams.length > 0 ? (
-              filteredTeams.map((team) => (
+            {filteredTeams.length === 0 ? (
+
+              <tr>
+
+                <td
+                  colSpan="7"
+                  className="empty-message"
+                >
+                  No teams found.
+                </td>
+
+              </tr>
+
+            ) : (
+
+              filteredTeams.map((team, index) => (
+
                 <tr key={team.id}>
 
-                  <td>#{team.id}</td>
+                  <td>{index + 1}</td>
 
                   <td>
-                    <strong>{team.teamName}</strong>
+                    <strong>
+                      {team.teamName}
+                    </strong>
                   </td>
 
-                  <td>{team.coachName}</td>
-
-                  <td>{team.contactInfo}</td>
-
-                  <td>{team.createdAt}</td>
+                  <td>
+                    {team.coachName}
+                  </td>
 
                   <td>
+                    {team.contactInfo}
+                  </td>
+
+                  <td>
+                    {getTournamentName(
+                      team.tournamentId
+                    )}
+                  </td>
+
+                  <td>
+                    {team.createdAt}
+                  </td>
+
+                  <td>
+
                     <div className="action-buttons">
 
                       <button
                         className="edit-btn"
                         onClick={() =>
-                          alert("Edit feature will be added soon.")
+                          handleEdit(team)
                         }
                       >
                         Edit
@@ -196,22 +397,21 @@ function Teams() {
 
                       <button
                         className="delete-btn"
-                        onClick={() => handleDelete(team.id)}
+                        onClick={() =>
+                          handleDelete(team.id)
+                        }
                       >
                         Delete
                       </button>
 
                     </div>
+
                   </td>
 
                 </tr>
+
               ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="empty-message">
-                  No teams found.
-                </td>
-              </tr>
+
             )}
 
           </tbody>
@@ -220,30 +420,48 @@ function Teams() {
 
       </div>
 
-      {/* Add Team Modal */}
+      {/* REGISTER / EDIT MODAL */}
+
       {showModal && (
+
         <div className="modal-overlay">
 
           <div className="modal">
 
             <div className="modal-header">
+
               <div>
-                <h2>Register New Team</h2>
-                <p>Enter team information below</p>
+
+                <h2>
+                  {editingTeam
+                    ? "Edit Team"
+                    : "Register Team"}
+                </h2>
+
+                <p>
+                  {editingTeam
+                    ? "Update team information."
+                    : "Enter information to register a new team."}
+                </p>
+
               </div>
 
               <button
                 className="close-btn"
-                onClick={() => setShowModal(false)}
+                onClick={handleClose}
               >
                 ×
               </button>
+
             </div>
 
             <form onSubmit={handleSubmit}>
 
               <div className="form-group">
-                <label>Team Name</label>
+
+                <label>
+                  Team Name
+                </label>
 
                 <input
                   type="text"
@@ -251,12 +469,15 @@ function Teams() {
                   placeholder="Enter team name"
                   value={formData.teamName}
                   onChange={handleChange}
-                  required
                 />
+
               </div>
 
               <div className="form-group">
-                <label>Coach Name</label>
+
+                <label>
+                  Coach Name
+                </label>
 
                 <input
                   type="text"
@@ -264,21 +485,57 @@ function Teams() {
                   placeholder="Enter coach name"
                   value={formData.coachName}
                   onChange={handleChange}
-                  required
                 />
+
               </div>
 
               <div className="form-group">
-                <label>Contact Information</label>
+
+                <label>
+                  Contact Information
+                </label>
 
                 <input
                   type="text"
                   name="contactInfo"
-                  placeholder="Enter phone number"
+                  placeholder="Phone or email"
                   value={formData.contactInfo}
                   onChange={handleChange}
-                  required
                 />
+
+              </div>
+
+              <div className="form-group">
+
+                <label>
+                  Tournament
+                </label>
+
+                <select
+                  name="tournamentId"
+                  value={formData.tournamentId}
+                  onChange={handleChange}
+                >
+
+                  <option value="">
+                    Select Tournament
+                  </option>
+
+                  {tournaments.map(
+                    (tournament) => (
+
+                      <option
+                        key={tournament.id}
+                        value={tournament.id}
+                      >
+                        {tournament.name}
+                      </option>
+
+                    )
+                  )}
+
+                </select>
+
               </div>
 
               <div className="modal-actions">
@@ -286,7 +543,7 @@ function Teams() {
                 <button
                   type="button"
                   className="cancel-btn"
-                  onClick={() => setShowModal(false)}
+                  onClick={handleClose}
                 >
                   Cancel
                 </button>
@@ -295,7 +552,9 @@ function Teams() {
                   type="submit"
                   className="primary-btn"
                 >
-                  Register Team
+                  {editingTeam
+                    ? "Update Team"
+                    : "Register Team"}
                 </button>
 
               </div>
@@ -305,6 +564,7 @@ function Teams() {
           </div>
 
         </div>
+
       )}
 
     </div>
