@@ -1650,3 +1650,204 @@ td {
     gap: 8px;
   }
 }
+/* =========================
+   TOURNAMENT STANDINGS
+========================= */
+
+.standing-filter {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.standing-filter .form-group {
+  flex: 1;
+  margin: 0;
+}
+
+.standing-search {
+  flex: 1;
+}
+
+.standing-search .search-input {
+  width: 100%;
+}
+
+.standing-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 22px 25px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.standing-title h2 {
+  margin: 5px 0 0;
+  font-size: 22px;
+}
+
+.standing-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  letter-spacing: 0.8px;
+}
+
+.standing-trophy {
+  font-size: 40px;
+}
+
+.standing-table {
+  overflow-x: auto;
+}
+
+.standing-table table {
+  min-width: 850px;
+}
+
+.standing-table th,
+.standing-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.standing-table th:nth-child(2),
+.standing-table td:nth-child(2) {
+  text-align: left;
+}
+
+.position-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 700;
+}
+
+.position-badge.first {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.standing-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.leader-icon {
+  font-size: 18px;
+}
+
+.stat-win {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.stat-draw {
+  color: #d97706;
+  font-weight: 700;
+}
+
+.stat-loss {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.goal-positive {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.goal-negative {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.goal-neutral {
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.points-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 15px;
+}
+
+.points-info {
+  margin-top: 20px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.points-info h3 {
+  margin: 0 0 15px;
+}
+
+.points-rules {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.points-rules div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  min-width: 140px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+
+.points-rules span {
+  color: #6b7280;
+}
+
+@media (max-width: 700px) {
+  .standing-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .standing-title {
+    padding: 18px;
+  }
+
+  .standing-title h2 {
+    font-size: 18px;
+  }
+
+  .standing-trophy {
+    font-size: 30px;
+  }
+
+  .points-rules {
+    flex-direction: column;
+  }
+
+  .points-rules div {
+    width: 100%;
+  }
+}
